@@ -14,7 +14,22 @@ end
 
 function _draw()
   cls()
+  draw_stars()
   draw_player()
+end
+
+function rndb(low, high)
+  return flr(rnd(high - low + 1) + low)
+end
+
+function draw_stars()
+  srand(1)
+
+  for i = 1, 50 do
+    pset(rndb(0, 127), rndb(0, 127), rndb(5, 7))
+  end
+
+  srand(time())
 end
 __gfx__
 00000000007007000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
