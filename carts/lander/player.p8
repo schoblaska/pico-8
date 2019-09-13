@@ -17,6 +17,8 @@ function move_player()
 
   p.x += p.dx
   p.y += p.dy
+
+  stay_on_screen()
 end
 
 function draw_player()
@@ -29,4 +31,21 @@ function thrust()
   if (btn(2)) p.dy -= p.thrust
 
   if (btn(0) or btn(1) or btn(2)) sfx(0)
+end
+
+function stay_on_screen()
+  if (p.x < 0) then
+    p.x = 0
+    p.dx = 0
+  end
+
+  if (p.x > 119) then
+    p.x = 119
+    p.dx = 0
+  end
+
+  if (p.y < 0) then
+    p.y = 0
+    p.dy = 0
+  end
 end
