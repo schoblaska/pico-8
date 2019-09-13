@@ -19,6 +19,13 @@ function _draw()
   cls()
   draw_cave()
   draw_player()
+
+  if (game_over) then
+    print("game over!", 44, 44, 7)
+    print("your score: " .. player.score, 34, 54, 7)
+  else
+    print("score: " .. player.score, 2, 2, 7)
+  end
 end
 
 function make_player()
@@ -45,6 +52,8 @@ function move_player()
   end
 
   player.y += player.dy
+
+  player.score += player.speed
 end
 
 function draw_player()
