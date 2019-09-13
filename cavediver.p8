@@ -8,8 +8,11 @@ function _init()
 end
 
 function _update()
-  update_cave()
-  move_player()
+  if (not game_over) then
+    update_cave()
+    move_player()
+    check_hit()
+  end
 end
 
 function _draw()
@@ -51,6 +54,15 @@ function draw_player()
     spr(player.rise, player.x, player.y)
   else
     spr(player.fall, player.x, player.y)
+  end
+end
+
+function check_hit()
+  for i = player.x, player.x + 7 do
+    if (cave[i + 1].top > player.y
+      or cave[i + 1].btm < player.y + 7) then
+      game_over = true
+    end
   end
 end
 
