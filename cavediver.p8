@@ -77,6 +77,8 @@ function make_cave()
 end
 
 function update_cave()
+  cave_colors = {5, 13}
+
   if (#cave > player.speed) then
     for i = 1, player.speed do
       del(cave, cave[1])
@@ -90,7 +92,7 @@ function update_cave()
     local col = {
       top = mid(3, cave[#cave].top + up, top),
       btm = mid(btm, cave[#cave].btm + dwn, 124),
-      clr = flr(rnd(16))
+      clr = cave_colors[flr(rnd(#cave_colors)) + 1]
     }
 
     add(cave, col)
@@ -98,9 +100,6 @@ function update_cave()
 end
 
 function draw_cave()
-  top_color = 5
-  btm_color = 5
-
   for i = 1, #cave do
     line(i - 1, 0,   i - 1, cave[i].top, cave[i].clr)
     line(i - 1, 127, i - 1, cave[i].btm, cave[i].clr)
