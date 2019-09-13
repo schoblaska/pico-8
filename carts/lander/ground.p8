@@ -1,6 +1,6 @@
 function make_ground()
   gnd = {}
-  local top = 96
+  local top = 86
   local btm = 120
 
   pad = {
@@ -24,7 +24,7 @@ function make_ground()
 
   -- bumpy ground left of pad
   for i = pad.x - 1, 0, -1 do
-    local h = rndb(gnd[i + 1] - 3, gnd[i + 1] + 3)
+    local h = rndb(gnd[i + 1] - 6, gnd[i + 1] + 6)
     gnd[i] = mid(top, h, btm)
   end
 end
