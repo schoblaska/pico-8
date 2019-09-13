@@ -5,13 +5,18 @@ __lua__
 #include lander/ground.p8
 
 function _init()
+  game_over = false
+  win = false
   g = 0.025 -- gravity
   make_player()
   make_ground()
 end
 
 function _update()
-  move_player()
+  if (not game_over) then
+    move_player()
+    check_land()
+  end
 end
 
 function _draw()
@@ -33,6 +38,11 @@ function draw_stars()
   end
 
   srand(time())
+end
+
+function end_game(won)
+  game_over = true
+  win = won
 end
 __gfx__
 0000000000700700762dddddddddd766000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
