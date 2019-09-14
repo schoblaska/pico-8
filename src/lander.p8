@@ -43,10 +43,7 @@ end
 
 #include lander/player.p8
 #include lander/ground.p8
-
-function rndb(low, high)
-  return flr(rnd(high - low + 1) + low)
-end
+#include utils/rndb.p8
 
 function draw_stars()
   srand(star_rand)
