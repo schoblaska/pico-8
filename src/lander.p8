@@ -4,9 +4,6 @@ __lua__
 -- lander
 -- by thrillhouse
 
-#include lander/player.p8
-#include lander/ground.p8
-
 function _init()
   game_over = false
   win = false
@@ -43,6 +40,9 @@ function _draw()
     print("press ❎ to play again", 22, 60, 5)
   end
 end
+
+#include lander/player.p8
+#include lander/ground.p8
 
 function rndb(low, high)
   return flr(rnd(high - low + 1) + low)
