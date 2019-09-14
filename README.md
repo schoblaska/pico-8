@@ -8,7 +8,7 @@ Messing around with the [PICO-8](http://pico-8.com).
     </td>
     <td width="189px" align="center">
       <a href="https://joeyschoblaska.github.io/pico-8/lander.html">
-        <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/dist/lander.p8.png">
+        <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/carts/lander.p8.png">
       </a>
     </td>
   </tr>
