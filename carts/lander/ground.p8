@@ -33,5 +33,10 @@ function draw_ground()
   for i = 0, 127 do
     line(i, gnd[i], i, 127, 5)
   end
+
   spr(pad.sprite, pad.x, pad.y, 2, 1)
+
+  if (game_over and win) then
+    spr(4, pad.x - 3, pad.y - 8)
+  end
 end

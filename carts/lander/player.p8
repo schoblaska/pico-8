@@ -22,7 +22,11 @@ function move_player()
 end
 
 function draw_player()
-  spr(p.sprite, p.x, p.y)
+  if (game_over and not win) then
+    spr(5, p.x, p.y)
+  else
+    spr(p.sprite, p.x, p.y)
+  end
 end
 
 function thrust()
