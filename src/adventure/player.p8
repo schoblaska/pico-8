@@ -31,5 +31,9 @@ function move_player()
 end
 
 function interact(x, y)
-  if (is_tile(key, x, y)) get_key(x, y)
+  if (is_tile(key, x, y)) then
+    get_key(x, y)
+  elseif (is_tile(door, x, y) and p.keys > 0) then
+    open_door(x, y)
+  end
 end

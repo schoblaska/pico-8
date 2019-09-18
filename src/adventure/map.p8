@@ -36,3 +36,9 @@ function get_key(x, y)
   swap_tile(x, y)
   sfx(1)
 end
+
+function open_door(x, y)
+  p.keys -= 1
+  swap_tile(x, y)
+  sfx(2)
+end
