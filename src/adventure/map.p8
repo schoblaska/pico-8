@@ -9,6 +9,10 @@ function map_setup()
 end
 
 function draw_map()
+  mapx = flr(p.x / 16) * 16
+  mapy = flr(p.y / 16) * 16
+  camera(mapx * 8, mapy  * 8)
+
   map(0, 0, 0, 0, 128, 64)
 end
 
