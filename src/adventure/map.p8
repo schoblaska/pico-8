@@ -11,3 +11,13 @@ end
 function draw_map()
   map(0, 0, 0, 0, 128, 64)
 end
+
+function is_tile(tile_type, x, y)
+  tile = mget(x, y)
+  has_flag = fget(tile, tile_type)
+  return has_flag
+end
+
+function can_move(x, y)
+  return not is_tile(wall, x, y)
+end
