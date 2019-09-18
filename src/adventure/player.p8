@@ -20,10 +20,16 @@ function move_player()
   if (btnp(2)) newy -= 1
   if (btnp(3)) newy += 1
 
+  interact(newx, newy)
+
   if (can_move(newx, newy)) then
     p.x = mid(0, newx, 127)
     p.y = mid(0, newy, 63)
   else
     sfx(0)
   end
+end
+
+function interact(x, y)
+  if (is_tile(key, x, y)) get_key(x, y)
 end

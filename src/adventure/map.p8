@@ -25,3 +25,14 @@ end
 function can_move(x, y)
   return not is_tile(wall, x, y)
 end
+
+function swap_tile(x, y)
+  tile = mget(x, y)
+  mset(x, y, tile + 1)
+end
+
+function get_key(x, y)
+  p.keys += 1
+  swap_tile(x, y)
+  sfx(1)
+end
