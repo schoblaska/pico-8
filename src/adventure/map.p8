@@ -1,4 +1,8 @@
 function map_setup()
+  timer = 0
+  anim_time = 30 -- 1 second
+
+  -- tile settings
   wall = 0
   key = 1
   door = 2
@@ -6,6 +10,15 @@ function map_setup()
   anim2 = 4
   lose = 6
   win = 7
+end
+
+function update_map()
+  if (timer < 0) then
+    toggle_tiles()
+    timer = anim_time
+  end
+
+  timer -= 1
 end
 
 function draw_map()
@@ -29,6 +42,11 @@ end
 function swap_tile(x, y)
   tile = mget(x, y)
   mset(x, y, tile + 1)
+end
+
+function unswap_tile(x, y)
+  tile = mget(x, y)
+  mset(x, y, tile - 1)
 end
 
 function get_key(x, y)
