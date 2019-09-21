@@ -23,8 +23,8 @@ function move_player()
   interact(newx, newy)
 
   if (can_move(newx, newy)) then
-    p.x = mid(0, newx, 127)
-    p.y = mid(0, newy, 63)
+    p.x = mid(0, newx, 31)
+    p.y = mid(0, newy, 15)
   else
     sfx(0)
   end
