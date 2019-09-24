@@ -15,4 +15,5 @@ function draw_win_lose()
   else
     print("game over! :(", 38, 64, 7)
   end
+  print("press ❎ to play againn", 20, 72, 5)
 end

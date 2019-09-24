@@ -14,6 +14,8 @@ function _update()
     update_map()
     move_player()
     check_win_lose()
+  else
+    if (btnp(5)) extcmd("reset")
   end
 end
 
