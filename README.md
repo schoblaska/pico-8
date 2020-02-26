@@ -1,5 +1,13 @@
 Messing around with the [PICO-8](http://pico-8.com).
 
+## Development (OS X)
+Create a link in PICO-8's cart directory to the carts in this project:
+
+```
+ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
+```
+
+## Games
 <table>
   <tr>
     <td valign="top">
