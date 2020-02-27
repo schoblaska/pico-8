@@ -7,6 +7,21 @@ Create a link in PICO-8's cart directory to the carts in this project:
 ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
 ```
 
+To build cartridges, first build the PNG so that the includes are included correctly. Then load the PNG and build the HTML and JS files.
+
+```
+# in PICO-8:
+load gamename
+export gamename.p8.png
+load gamename.p8.png
+export gamename.html
+
+# from command line:
+mv src/gamename.p8.png carts/
+mv src/gamename.html docs/
+mv src/gamename.js docs/
+```
+
 ## Games
 <table>
   <tr>
