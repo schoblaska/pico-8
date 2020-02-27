@@ -11,6 +11,15 @@ ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
 <table>
   <tr>
     <td valign="top">
+      <a href="https://joeyschoblaska.github.io/pico-8/raycaster.html">
+        <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/carts/raycaster.p8.png" align="right">
+      </a>
+      <h3>Raycaster</h3>
+      An experiment using ray casting to create a Wolfenstein 3D like engine in PICO-8.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
       <a href="https://joeyschoblaska.github.io/pico-8/lander.html">
         <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/carts/lander.p8.png" align="right">
       </a>
