@@ -12,9 +12,10 @@ To build cartridges, first build the PNG (in the PNG version, the includes are f
 ```
 # in PICO-8:
 load gamename
-export gamename.p8.png
+save gamename.p8.png
 load gamename.p8.png
 export gamename.html
+load gamename
 
 # from command line:
 mv src/gamename.p8.png carts/
