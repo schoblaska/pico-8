@@ -45,7 +45,7 @@ function _update()
   oldPlane = plane
 
   -- rotate left
-  if btn(0) then
+  if btn(0) and not btn(4) then
     dir = { x = oldDir.x * cos(-rotSpeed) - oldDir.y * sin(-rotSpeed),
             y = oldDir.x * sin(-rotSpeed) + oldDir.y * cos(-rotSpeed) }
     plane = { x = oldPlane.x * cos(-rotSpeed) - oldPlane.y * sin(-rotSpeed),
@@ -53,7 +53,7 @@ function _update()
   end
 
   -- rotate right
-  if btn(1) then
+  if btn(1) and not btn(4) then
     dir = { x = oldDir.x * cos(rotSpeed) - oldDir.y * sin(rotSpeed),
             y = oldDir.x * sin(rotSpeed) + oldDir.y * cos(rotSpeed) }
     plane = { x = oldPlane.x * cos(rotSpeed) - oldPlane.y * sin(rotSpeed),
@@ -70,6 +70,24 @@ function _update()
   if btn(3) then
     if world[flr(pos.x - dir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x -= dir.x * moveSpeed end
     if world[flr(pos.x)][flr(pos.y - dir.y * moveSpeed)] == 0 then pos.y -= dir.y * moveSpeed end
+  end
+
+  -- strafe left
+  if btn(0) and btn(4) then
+    moveDir = { x = dir.x * cos(0.25) - dir.y * sin(0.25),
+                y = dir.x * sin(0.25) + dir.y * cos(0.25) }
+
+    if world[flr(pos.x - moveDir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x -= moveDir.x * moveSpeed end
+    if world[flr(pos.x)][flr(pos.y - moveDir.y * moveSpeed)] == 0 then pos.y -= moveDir.y * moveSpeed end
+  end
+
+  -- strafe right
+  if btn(1) and btn(4) then
+    moveDir = { x = dir.x * cos(0.25) - dir.y * sin(0.25),
+                y = dir.x * sin(0.25) + dir.y * cos(0.25) }
+
+    if world[flr(pos.x + moveDir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x += moveDir.x * moveSpeed end
+    if world[flr(pos.x)][flr(pos.y + moveDir.y * moveSpeed)] == 0 then pos.y += moveDir.y * moveSpeed end
   end
 end
 
