@@ -53,21 +53,36 @@ function _init()
   rotSpeed = 0.01
   moveSpeed = 0.25
   minimap = false
+  titleScreen = true
+  showInstructions = 150
 end
 
 function _update()
   move()
-  if btnp(5) then minimap = not minimap end
+
+  if titleScreen then
+    if btnp() > 0 then
+      titleScreen = false
+    end
+  else
+    if showInstructions > 0 then showInstructions -= 1 end
+    if btnp(5) then minimap = not minimap end
+  end
 end
 
 function _draw()
   cls()
-  draw_rays()
-  draw_minimap()
 
-  if time() < 5 then
-    print("hold z to strafe", 1, 1, 5)
-    print("press x to toggle minimap", 1, 8, 5)
+  if titleScreen then
+    print "press any key to start" -- placeholder
+  else
+    draw_rays()
+    draw_minimap()
+
+    if showInstructions > 0 then
+      print("hold z to strafe", 1, 1, 5)
+      print("press x to toggle minimap", 1, 8, 5)
+    end
   end
 end
 
