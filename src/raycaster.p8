@@ -66,8 +66,8 @@ function _draw()
   draw_minimap()
 
   if time() < 5 then
-    print("hold z to strafe", 0, 0, 5)
-    print("press x to toggle minimap", 0, 7, 5)
+    print("hold z to strafe", 1, 1, 5)
+    print("press x to toggle minimap", 1, 8, 5)
   end
 end
 
