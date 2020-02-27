@@ -1,28 +1,5 @@
 Messing around with the [PICO-8](http://pico-8.com).
 
-## Development (OS X)
-Create a link in PICO-8's cart directory to the carts in this project:
-
-```
-ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
-```
-
-To build cartridges, first build the PNG (in the PNG version, the includes are flattened into one file). Then load the PNG and build the HTML and JS files from that.
-
-```
-# in PICO-8:
-load gamename
-save gamename.p8.png
-load gamename.p8.png
-export gamename.html
-load gamename
-
-# from command line:
-mv src/gamename.p8.png carts/
-mv src/gamename.html docs/
-mv src/gamename.js docs/
-```
-
 ## Games
 <table>
   <tr>
@@ -47,3 +24,26 @@ mv src/gamename.js docs/
     </td>
   </tr>
 </table>
+
+## Development (OS X)
+Create a link in PICO-8's cart directory to the carts in this project:
+
+```
+ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
+```
+
+To build cartridges, first build the PNG (in the PNG version, the includes are flattened into one file). Then load the PNG and build the HTML and JS files from that.
+
+```
+# in PICO-8:
+load gamename
+save gamename.p8.png
+load gamename.p8.png
+export gamename.html
+load gamename
+
+# from command line:
+mv src/gamename.p8.png carts/
+mv src/gamename.html docs/
+mv src/gamename.js docs/
+```
