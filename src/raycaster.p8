@@ -60,6 +60,10 @@ end
 function _draw()
   cls()
   draw_rays()
+
+  if time() < 5 then
+    print("hold z to strafe", 0, 0, 5)
+  end
 end
 
 __gfx__
