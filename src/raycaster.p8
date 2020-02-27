@@ -113,7 +113,7 @@ function _draw()
     for coord in all {"x", "y"} do
       if (rayDir[coord] < 0) then
         step[coord] = -1
-        sideDist[coord] = (pos[coord] + mapPos[coord]) * deltaDist[coord]
+        sideDist[coord] = (pos[coord] - mapPos[coord]) * deltaDist[coord]
       else
         step[coord] = 1
         sideDist[coord] = (mapPos[coord] + 1 - pos[coord]) * deltaDist[coord]
