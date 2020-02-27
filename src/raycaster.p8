@@ -4,6 +4,15 @@ __lua__
 -- raycaster
 -- by thrillhouse
 
+-- [x] untextured raycasting
+-- [ ] textures
+-- [ ] minimap
+-- [ ] map editor
+-- [ ] cover image
+-- [ ] music
+-- [ ] sprites
+-- [ ] raycasting explanation "slide"
+
 function _init()
   world = {
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
