@@ -5,13 +5,13 @@ __lua__
 -- by thrillhouse
 
 -- [x] untextured raycasting
+-- [ ] map editor
 -- [ ] wall textures
+-- [ ] sprites
 -- [ ] floor and ceiling textures
 -- [ ] minimap
--- [ ] map editor
 -- [ ] cover image
 -- [ ] music
--- [ ] sprites
 -- [ ] raycasting explanation "slide"
 
 #include raycaster/rays.p8
