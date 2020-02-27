@@ -156,7 +156,7 @@ function _draw()
     elseif wall == 3 and not side then lineColor = 7
     elseif wall == 4 and     side then lineColor = 8
     elseif wall == 4 and not side then lineColor = 2
-    else                               lineColor = 0
+    else                               lineColor = 10
     end
 
     line(x, drawTop, x, drawBot, lineColor)
