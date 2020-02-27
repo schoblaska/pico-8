@@ -7,7 +7,7 @@ Create a link in PICO-8's cart directory to the carts in this project:
 ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
 ```
 
-To build cartridges, first build the PNG so that the includes are included correctly. Then load the PNG and build the HTML and JS files.
+To build cartridges, first build the PNG (in the PNG version, the includes are flattened into one file). Then load the PNG and build the HTML and JS files from that.
 
 ```
 # in PICO-8:
