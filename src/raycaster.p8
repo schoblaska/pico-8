@@ -9,13 +9,14 @@ __lua__
 -- [ ] wall textures
 -- [ ] sprites
 -- [ ] floor and ceiling textures
--- [ ] minimap
--- [ ] cover image
+-- [x] minimap
+-- [ ] title screen
 -- [ ] music
--- [ ] raycasting explanation "slide"
+-- [ ] raycasting explanation screen
 
 #include raycaster/rays.p8
 #include raycaster/movement.p8
+#include raycaster/minimap.p8
 
 function _init()
   world = {
@@ -51,18 +52,22 @@ function _init()
 
   rotSpeed = 0.01
   moveSpeed = 0.25
+  minimap = false
 end
 
 function _update()
   move()
+  if btnp(5) then minimap = not minimap end
 end
 
 function _draw()
   cls()
   draw_rays()
+  draw_minimap()
 
   if time() < 5 then
     print("hold z to strafe", 0, 0, 5)
+    print("press x to toggle minimap", 0, 7, 5)
   end
 end
 
