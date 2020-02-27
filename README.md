@@ -47,3 +47,6 @@ mv src/gamename.p8.png carts/
 mv src/gamename.html docs/
 mv src/gamename.js docs/
 ```
+
+## Resources
+* [PICO-8 Cheat Sheet](https://www.lexaloffle.com/bbs/files/16585/PICO-8_Cheat-Sheet_0-9-2.png)
