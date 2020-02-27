@@ -17,9 +17,7 @@ ln -s ~/projects/pico-8/src ~/Library/Application\ Support/pico-8/carts/gh
       <h3>Raycaster</h3>
       An experiment using raycasting to create a Wolfenstein 3D like engine in PICO-8.
 
-      <ul>
-        <li><a href="https://lodev.org/cgtutor/raycasting.html">Lode's Computer Graphics Tutorial: Raycasting</a></li>
-      </ul>
+      * [Lode's Computer Graphics Tutorial: Raycasting](https://lodev.org/cgtutor/raycasting.html)
     </td>
   </tr>
   <tr>
