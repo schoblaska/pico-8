@@ -8,6 +8,7 @@ __lua__
 -- [x] wall textures
 -- [x] minimap
 -- [x] sprites
+-- [ ] sort sprites by distance to player
 -- [ ] interaction with sprites
 -- [ ] map editor
 -- [ ] title screen
@@ -47,7 +48,7 @@ function _init()
   }
 
   doggos = {
-    {x = 11.5, y = 15.5, spriteY = 0}
+    {x = 11.5, y = 15.5, spriteY = 32}
   }
 
   pos = {x = 22, y = 12}
