@@ -5,11 +5,10 @@ __lua__
 -- by thrillhouse
 
 -- [x] untextured raycasting
--- [ ] map editor
 -- [x] wall textures
--- [ ] sprites
--- [ ] floor and ceiling textures
 -- [x] minimap
+-- [ ] sprites
+-- [ ] map editor
 -- [ ] title screen
 -- [ ] music
 -- [ ] raycasting explanation screen
@@ -81,9 +80,9 @@ function _draw()
     draw_minimap()
 
     if showInstructions > 0 then
-      print("hold z to strafe", 1, 1, 5)
+      print("hold z to strafe", 1, 1, 6)
     else
-      if showCPU then print("cpu: " .. stat(1), 1, 1, 5) end
+      if showCPU then print("cpu: " .. stat(1), 1, 1, 6) end
     end
   end
 end

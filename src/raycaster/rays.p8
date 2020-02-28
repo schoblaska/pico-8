@@ -12,6 +12,7 @@ local texOrigins = {
 }
 
 function draw_rays()
+  rectfill(0, 0, 127, 63, 13)
   -- loop through each column of the screen
   for x = 0, 127 do
     -- set initial variables
