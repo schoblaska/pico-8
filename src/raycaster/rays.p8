@@ -2,7 +2,7 @@
 -- 3400  like this. even-numbered textures are the shadowy versions
 -- 5600  of the odd-numbered texture to their left
 -- 0000
-texOrigins = {
+local texOrigins = {
   {x = 0,  y = 0},
   {x = 32, y = 0},
   {x = 0,  y = 32},
@@ -113,7 +113,14 @@ function wall_color(wall, side)
 end
 
 function wall_texture(wall, side)
-  if side then return 3 else return 4 end
+  if     wall == 1 and     side then return 1
+  elseif wall == 1 and not side then return 2
+  elseif wall == 2 and     side then return 3
+  elseif wall == 2 and not side then return 4
+  elseif wall == 3 and     side then return 5
+  elseif wall == 3 and not side then return 6
+  else                               return 1
+  end
 end
 
 function pixel_from_texture(texNum, texX, texY)
