@@ -112,11 +112,17 @@ function draw_rays()
         y = invDet * (-plane.y * sprite.x + plane.x * sprite.y)
       }
 
-      spriteScreenX = flr(64 * (1 + transform.x / transform.y))
-      spriteHeight = abs(flr(128 / transform.y))
-      drawStartY = flr(-spriteHeight / 2 + 64)
+      -- params for scaling and moving sprite
+      hScale = 0.75
+      vScale = 0.75
+      vMove = 30
+      vMoveScreen = flr(vMove / transform.y)
 
-      spriteWidth = abs(flr(128 / transform.y))
+      spriteScreenX = flr(64 * (1 + transform.x / transform.y))
+      spriteHeight = abs(flr(128 / transform.y)) * vScale
+      drawStartY = flr(-spriteHeight / 2 + 64) + vMoveScreen
+
+      spriteWidth = abs(flr(128 / transform.y)) * hScale
       drawStartX = flr(max(0, -spriteWidth / 2 + spriteScreenX))
       drawEndX = flr(min(127, spriteWidth / 2 + spriteScreenX))
 
