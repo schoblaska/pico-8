@@ -1,3 +1,16 @@
+-- 1200  there are 6 wall textures, arranged on the sprite sheet
+-- 3400  like this. even-numbered textures are the shadowy versions
+-- 5600  of the odd-numbered texture to their left
+-- 0000
+texOrigins = {
+  {x = 0,  y = 0},
+  {x = 32, y = 0},
+  {x = 0,  y = 32},
+  {x = 32, y = 32},
+  {x = 0,  y = 64},
+  {x = 32, y = 64}
+}
+
 function draw_rays()
   -- loop through each column of the screen
   for x = 0, 127 do
@@ -103,16 +116,6 @@ function wall_texture(wall, side)
   if side then return 3 else return 4 end
 end
 
--- 1200  there are 6 wall textures, arranged on the sprite sheet
--- 3400  like this. even-numbered textures are the shadowy versions
--- 5600  of the odd-numbered texture to their left
--- 0000
 function pixel_from_texture(texNum, texX, texY)
-  if (texNum % 2 == 0) then
-    origin = {x = 32, y = (texNum / 2 - 1) * 32}
-  else
-    origin = {x = 0, y = flr(texNum / 2)  * 32}
-  end
-
-  return sget(origin.x + texX, origin.y + texY)
+  return sget(texOrigins[texNum].x + texX, texOrigins[texNum].y + texY)
 end

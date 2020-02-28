@@ -56,6 +56,7 @@ function _init()
   titleScreen = true
   showInstructions = 150
   useTextures = true
+  showCPU = true
 end
 
 function _update()
@@ -67,7 +68,6 @@ function _update()
     end
   else
     if showInstructions > 0 then showInstructions -= 1 end
-    if btnp(5) then minimap = not minimap end
   end
 end
 
@@ -82,7 +82,8 @@ function _draw()
 
     if showInstructions > 0 then
       print("hold z to strafe", 1, 1, 5)
-      print("press x to toggle minimap", 1, 8, 5)
+    else
+      if showCPU then print("cpu: " .. stat(1), 1, 1, 5) end
     end
   end
 end
