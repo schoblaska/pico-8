@@ -49,3 +49,25 @@ function strafe_right()
   if world[flr(pos.x + moveDir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x += moveDir.x * moveSpeed end
   if world[flr(pos.x)][flr(pos.y + moveDir.y * moveSpeed)] == 0 then pos.y += moveDir.y * moveSpeed end
 end
+
+function give_treat()
+  giveTreatSpeed = 4
+
+  if btn(5) then
+    treatY = max(80, treatY - giveTreatSpeed)
+  else
+    if treatY < 90 then
+      -- treat successfully given
+      for doggo in all(doggos) do
+        doggoDistance = (pos.x - doggo.x) * (pos.x - doggo.x) + (pos.y - doggo.y) * (pos.y - doggo.y)
+        if doggoDistance < 5 then doggo.spriteY = 32 end
+      end
+    end
+
+    treatY = 128
+  end
+end
+
+function draw_treat()
+  sspr(64, 64, 32, 32, 48, treatY, 32, 32)
+end
