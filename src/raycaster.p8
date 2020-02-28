@@ -80,7 +80,7 @@ function _draw()
     draw_minimap()
 
     if showInstructions > 0 then
-      print("hold z to strafe", 1, 1, 6)
+      print("hold z / 🅾️ to strafe", 1, 1, 6)
     else
       if showCPU then print("cpu: " .. stat(1), 1, 1, 6) end
     end
