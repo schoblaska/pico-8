@@ -51,3 +51,5 @@ mv src/gamename.js docs/
 ## Resources
 * [PICO-8 Cheat Sheet](https://www.lexaloffle.com/bbs/files/16585/PICO-8_Cheat-Sheet_0-9-2.png)
 * [Famous characters as PICO-8 sprites](https://twitter.com/johanvinet/status/635814153601597441)
+* [Food and drink sprites](https://twitter.com/JUSTIN_CYR/status/634546317713391616)
+* [Curated list of resources](https://github.com/pico-8/awesome-PICO-8#resources)
