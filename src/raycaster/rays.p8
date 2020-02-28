@@ -52,18 +52,67 @@ function draw_rays()
     drawTop = max(0, -lineHeight / 2 + 64)
     drawBot = min(127, lineHeight / 2 + 64)
 
-    -- determine wall color
-    if     wall == 1 and     side then lineColor = 3
-    elseif wall == 1 and not side then lineColor = 11
-    elseif wall == 2 and     side then lineColor = 12
-    elseif wall == 2 and not side then lineColor = 13
-    elseif wall == 3 and     side then lineColor = 6
-    elseif wall == 3 and not side then lineColor = 7
-    elseif wall == 4 and     side then lineColor = 8
-    elseif wall == 4 and not side then lineColor = 2
-    else                               lineColor = 10
-    end
+    -- draw
+    if useTextures then
+      texNum = wall_texture(wall, side)
 
-    line(x, drawTop, x, drawBot, lineColor)
+      -- calculate the x coordinate of the wall where the ray hit
+      if side then
+        wallX = pos.x + wallDist * rayDir.x
+      else
+        wallX = pos.y + wallDist * rayDir.y
+      end
+
+      wallX -= flr(wallX)
+
+      -- calculate the x coordinate of the texture
+      texX = flr(wallX * 32)
+
+      if (side and rayDir.y < 0) or (not side and rayDir.x > 0) then
+        texX = 32 - texX - 1
+      end
+
+      texStep = 32 / lineHeight
+      texPos = (drawTop - 127 / 2 + lineHeight / 2) * texStep
+
+      for y = drawTop, drawBot do
+        texY = min(flr(texPos), 31)
+        texPos += texStep
+        pset(x, y, pixel_from_texture(texNum, texX, texY))
+      end
+    else
+      line(x, drawTop, x, drawBot, wall_color(wall, side))
+    end
   end
+end
+
+function wall_color(wall, side)
+  if     wall == 1 and     side then return 3
+  elseif wall == 1 and not side then return 11
+  elseif wall == 2 and     side then return 12
+  elseif wall == 2 and not side then return 13
+  elseif wall == 3 and     side then return 6
+  elseif wall == 3 and not side then return 7
+  elseif wall == 4 and     side then return 8
+  elseif wall == 4 and not side then return 2
+  else                               return 10
+  end
+end
+
+function wall_texture(wall, side)
+  if side then return 3 else return 4 end
+end
+
+-- 1200  there are 6 wall textures, arranged on the sprite sheet
+-- 3400  like this. even-numbered textures are the shadowy versions
+-- 5600  of the odd-numbered texture to their left
+-- 0000
+function pixel_from_texture(texNum, texX, texY)
+  if (texNum % 2 == 0) then
+    origin = {x = 32, y = (texNum / 2 - 1) * 32}
+  else
+    origin = {x = 0, y = flr(texNum / 2)  * 32}
+  end
+
+  return sget(origin.x + texX, origin.y + texY)
 end
