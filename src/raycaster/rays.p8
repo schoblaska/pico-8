@@ -127,10 +127,12 @@ function draw_rays()
       drawEndX = flr(min(127, spriteWidth / 2 + spriteScreenX))
 
       for stripe = drawStartX, drawEndX do
+        if flr(time()) % 2 == 0 then texOffset = 64 else texOffset = 96 end
+
         if transform.y > 0 and transform.y < zBuf[stripe] then
           texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * 32 / spriteWidth)
           texX = min(max(0, texX), 31)
-          sspr(texX + 64, 0, 1, 32, stripe, drawStartY, 1, spriteHeight)
+          sspr(texX + texOffset, 0, 1, 32, stripe, drawStartY, 1, spriteHeight)
         end
       end
     end
