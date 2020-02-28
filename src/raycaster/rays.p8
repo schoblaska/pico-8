@@ -68,8 +68,6 @@ function draw_rays()
 
     -- draw
     if useTextures then
-      texNum = wall_texture(wall, side)
-
       -- calculate the x coordinate of the wall where the ray hit
       if side then
         wallX = pos.x + wallDist * rayDir.x
@@ -86,14 +84,12 @@ function draw_rays()
         texX = 32 - texX - 1
       end
 
-      texStep = 32 / lineHeight
-      texPos = (drawTop - 127 / 2 + lineHeight / 2) * texStep
+      -- use sspr to select a column of the texture and stretch it over the line to draw
+      texNum = wall_texture(wall, side)
+      sx = texOrigins[texNum].x + texX
+      dy = -lineHeight / 2 + 64
 
-      for y = drawTop, drawBot do
-        texY = min(flr(texPos), 31)
-        texPos += texStep
-        pset(x, y, pixel_from_texture(texNum, texX, texY))
-      end
+      sspr(sx, texOrigins[texNum].y, 1, 32, x, dy, 1, lineHeight)
     else
       line(x, drawTop, x, drawBot, wall_color(wall, side))
     end
@@ -122,8 +118,4 @@ function wall_texture(wall, side)
   elseif wall == 3 and not side then return 6
   else                               return 1
   end
-end
-
-function pixel_from_texture(texNum, texX, texY)
-  return sget(texOrigins[texNum].x + texX, texOrigins[texNum].y + texY)
 end
