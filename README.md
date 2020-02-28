@@ -50,3 +50,4 @@ mv src/gamename.js docs/
 
 ## Resources
 * [PICO-8 Cheat Sheet](https://www.lexaloffle.com/bbs/files/16585/PICO-8_Cheat-Sheet_0-9-2.png)
+* [Famous characters as PICO-8 sprites](https://twitter.com/johanvinet/status/635814153601597441)
