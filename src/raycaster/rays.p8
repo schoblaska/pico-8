@@ -13,6 +13,8 @@ local texOrigins = {
 
 function draw_rays()
   rectfill(0, 0, 127, 63, 13)
+  zBuf = {}
+
   -- loop through each column of the screen
   for x = 0, 127 do
     -- set initial variables
@@ -60,6 +62,7 @@ function draw_rays()
     -- calculate distance to wall (using camera plane)
     if side then coord = "y" else coord = "x" end
     wallDist = (mapPos[coord] - pos[coord] + (1 - step[coord]) / 2) / rayDir[coord]
+    zBuf[x] = wallDist
 
     -- calculate line top and bottom
     lineHeight = 128 / wallDist
@@ -92,6 +95,38 @@ function draw_rays()
       sspr(sx, texOrigins[texNum].y, 1, 32, x, dy, 1, lineHeight)
     else
       line(x, drawTop, x, drawBot, wall_color(wall, side))
+    end
+  end
+
+  -- sprites
+  if useSprites then
+    -- TODO: sort sprites from far to close
+    for doggo in all(doggos) do
+      sprite = {x = doggo.x - pos.x, y = doggo.y - pos.y}
+
+      -- transform sprite
+      invDet = 1 / (plane.x * dir.y - dir.x * plane.y)
+
+      transform = {
+        x = invDet * (dir.y * sprite.x - dir.x * sprite.y),
+        y = invDet * (-plane.y * sprite.x + plane.x * sprite.y)
+      }
+
+      spriteScreenX = flr(64 * (1 + transform.x / transform.y))
+      spriteHeight = abs(flr(128 / transform.y))
+      drawStartY = flr(-spriteHeight / 2 + 64)
+
+      spriteWidth = abs(flr(128 / transform.y))
+      drawStartX = flr(max(0, -spriteWidth / 2 + spriteScreenX))
+      drawEndX = flr(min(127, spriteWidth / 2 + spriteScreenX))
+
+      for stripe = drawStartX, drawEndX do
+        if transform.y > 0 and transform.y < zBuf[stripe] then
+          texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * 32 / spriteWidth)
+          texX = max(0, texX)
+          sspr(texX + 64, 0, 1, 64, stripe, drawStartY, 1, spriteHeight)
+        end
+      end
     end
   end
 end

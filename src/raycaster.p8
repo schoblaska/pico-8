@@ -45,6 +45,10 @@ function _init()
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
   }
 
+  doggos = {
+    {x = 11.5, y = 15.5}
+  }
+
   pos = {x = 22, y = 12}
   dir = {x = -1, y = 0}
   plane = {x = 0, y = 0.66}
@@ -55,6 +59,7 @@ function _init()
   titleScreen = true
   showInstructions = 150
   useTextures = true
+  useSprites = true
   showCPU = true
 end
 
