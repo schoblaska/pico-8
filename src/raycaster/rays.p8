@@ -124,7 +124,7 @@ function draw_rays()
         if transform.y > 0 and transform.y < zBuf[stripe] then
           texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * 32 / spriteWidth)
           texX = max(0, texX)
-          sspr(texX + 64, 0, 1, 64, stripe, drawStartY, 1, spriteHeight)
+          sspr(texX + 64, 0, 1, 32, stripe, drawStartY, 1, spriteHeight)
         end
       end
     end
