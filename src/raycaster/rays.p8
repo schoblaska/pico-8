@@ -132,7 +132,7 @@ function draw_rays()
         if transform.y > 0 and transform.y < zBuf[stripe] then
           texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * 32 / spriteWidth)
           texX = min(max(0, texX), 31)
-          sspr(texX + texOffset, 0, 1, 32, stripe, drawStartY, 1, spriteHeight)
+          sspr(texX + texOffset, doggo.spriteY, 1, 32, stripe, drawStartY, 1, spriteHeight)
         end
       end
     end
