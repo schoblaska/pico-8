@@ -1,6 +1,17 @@
 function draw_ui()
   rectfill(0, 110, 127, 127, 12)
-  sspr(32, 96, 16, 16, 56, 111)
+
+  -- player face
+  if flr(t()) % 2 == 1 then
+    sspr(32, 96, 16, 16, 56, 111)
+  else
+    decimal = flr((t() - flr(t())) * 10)
+    if decimal < 5 then
+      sspr(48, 96, 16, 16, 56, 111)
+    else
+      sspr(32, 112, 16, 16, 56, 111)
+    end
+  end
 
   if player.score > 99 then
     scoreX = 8
