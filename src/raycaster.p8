@@ -6,24 +6,24 @@ __lua__
 
 -- [x] untextured raycasting
 -- [x] wall textures
--- [x] minimap
 -- [x] sprites
 -- [x] give treats to dogs
+-- [x] method to step through demo (raycasting screen, flat and buggy, flat, textured, sprites)
 -- [ ] sort sprites by distance to player
 -- [ ] more sprites
+-- [ ] map editor
+-- [ ] recreate wolf3d 1-1 map
+-- [ ] raycasting explanation screen
+
 -- [ ] pick up treats before giving
 -- [ ] bottom-of-screen ui
--- [ ] recreate wolf3d 1-1 map
--- [ ] method to step through demo (raycasting screen, flat and buggy, flat, textured, sprites)
--- [ ] map editor
 -- [ ] title screen
 -- [ ] music
--- [ ] raycasting explanation screen
 -- [ ] when "wielding" treats, show on bottom of screen and bob when walking
+-- [ ] doors (use sprites that don't rotate?)
 
 #include raycaster/rays.p8
 #include raycaster/player.p8
-#include raycaster/minimap.p8
 
 function _init()
   world = {
@@ -63,23 +63,61 @@ function _init()
 
   rotSpeed = 0.01
   moveSpeed = 0.25
-  minimap = false
-  titleScreen = true
   showInstructions = 150
   useTextures = true
   useSprites = true
   showCPU = true
   givingTreat = false
   treatY = 128
+  mode = 0
 end
 
 function _update()
-  if titleScreen then
-    if btnp() > 0 then
-      titleScreen = false
-    end
-  else
-    if showInstructions > 0 then showInstructions -= 1 end
+  if mode == 0 then
+    -- title slide
+    if btnp() > 0 then mode += 1 end
+  elseif mode == 1 then
+    -- buggy flat textures
+    if btnp(5) then mode += 1 end
+
+    useTextures = false
+    useSprites = false
+
+    update_instructions()
+    move()
+  elseif mode == 2 then
+    -- fixed flat textures
+    if btnp(5) then mode += 1 end
+
+    useTextures = false
+    useSprites = false
+
+    update_instructions()
+    move()
+  elseif mode == 3 then
+    -- add textures
+    if btnp(5) then mode += 1 end
+
+    useTextures = true
+    useSprites = false
+
+    update_instructions()
+    move()
+  elseif mode == 4 then
+    -- add sprites
+    if btnp(5) then mode += 1 end
+
+    useTextures = true
+    useSprites = true
+
+    update_instructions()
+    move()
+  elseif mode == 5 then
+    -- add treats
+    useTextures = true
+    useSprites = true
+
+    update_instructions()
     move()
     give_treat()
   end
@@ -88,18 +126,36 @@ end
 function _draw()
   cls()
 
-  if titleScreen then
-    print "press any key to start" -- placeholder
-  else
+  if mode == 0 then
+    print "raycaster explanation slide" -- placeholder
+  elseif mode == 1 then
     draw_rays()
-    draw_minimap()
+    draw_instructions()
+  elseif mode == 2 then
+    draw_rays()
+    draw_instructions()
+  elseif mode == 3 then
+    draw_rays()
+    draw_instructions()
+  elseif mode == 4 then
+    draw_rays()
+    draw_instructions()
+  elseif mode == 5 then
+    draw_rays()
     draw_treat()
+    draw_instructions()
+  end
+end
 
-    if showInstructions > 0 then
-      print("hold z / 🅾️ to strafe", 1, 1, 6)
-    else
-      if showCPU then print("cpu: " .. stat(1), 1, 1, 6) end
-    end
+function update_instructions()
+  if showInstructions > 0 then showInstructions -= 1 end
+end
+
+function draw_instructions()
+  if showInstructions > 0 then
+    print("hold z to strafe", 1, 1, 6)
+  else
+    if showCPU then print("cpu: " .. stat(1), 1, 1, 6) end
   end
 end
 

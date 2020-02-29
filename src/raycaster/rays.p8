@@ -12,7 +12,7 @@ local texOrigins = {
 }
 
 function draw_rays()
-  rectfill(0, 0, 127, 63, 13)
+  if useTextures then rectfill(0, 0, 127, 63, 13) end
   zBuf = {}
 
   -- loop through each column of the screen
@@ -34,7 +34,12 @@ function draw_rays()
     for coord in all {"x", "y"} do
       if (rayDir[coord] < 0) then
         step[coord] = -1
-        sideDist[coord] = (pos[coord] - mapPos[coord]) * deltaDist[coord]
+        if mode == 1 then
+          -- remove this later. intentionally showing bug for demo
+          sideDist[coord] = (pos[coord] + mapPos[coord]) * deltaDist[coord]
+        else
+          sideDist[coord] = (pos[coord] - mapPos[coord]) * deltaDist[coord]
+        end
       else
         step[coord] = 1
         sideDist[coord] = (mapPos[coord] + 1 - pos[coord]) * deltaDist[coord]
@@ -140,15 +145,13 @@ function draw_rays()
 end
 
 function wall_color(wall, side)
-  if     wall == 1 and     side then return 3
-  elseif wall == 1 and not side then return 11
+  if     wall == 1 and     side then return 7
+  elseif wall == 1 and not side then return 6
   elseif wall == 2 and     side then return 12
   elseif wall == 2 and not side then return 13
-  elseif wall == 3 and     side then return 6
-  elseif wall == 3 and not side then return 7
-  elseif wall == 4 and     side then return 8
-  elseif wall == 4 and not side then return 2
-  else                               return 10
+  elseif wall == 3 and     side then return 8
+  elseif wall == 3 and not side then return 2
+  else                               return 7
   end
 end
 
