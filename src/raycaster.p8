@@ -16,6 +16,7 @@ __lua__
 -- [ ] sort sprites by distance to player
 -- [ ] more sprites
 
+-- [ ] "accent" walls
 -- [ ] pick up treats before giving
 -- [ ] title screen
 -- [ ] music
