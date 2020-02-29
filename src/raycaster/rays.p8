@@ -21,11 +21,11 @@ function draw_rays()
     cameraX = 2 * x / 127 - 1
 
     rayDir = {
-      x = dir.x + plane.x * cameraX,
-      y = dir.y + plane.y * cameraX
+      x = player.dir.x + plane.x * cameraX,
+      y = player.dir.y + plane.y * cameraX
     }
 
-    mapPos = {x = flr(pos.x), y = flr(pos.y)} -- which square of the map we're evaluating
+    mapPos = {x = flr(player.pos.x), y = flr(player.pos.y)} -- which square of the map we're evaluating
     sideDist = {} -- length of ray from current position to next x or y side
     deltaDist = {x = abs(1 / rayDir.x), y = abs(1/rayDir.y) } -- length of ray from one x or y side to the next
     step = {} -- what direction to step in (+1 or -1)
@@ -36,13 +36,13 @@ function draw_rays()
         step[coord] = -1
         if mode == 1 then
           -- remove this later. intentionally showing bug for demo
-          sideDist[coord] = (pos[coord] + mapPos[coord]) * deltaDist[coord]
+          sideDist[coord] = (player.pos[coord] + mapPos[coord]) * deltaDist[coord]
         else
-          sideDist[coord] = (pos[coord] - mapPos[coord]) * deltaDist[coord]
+          sideDist[coord] = (player.pos[coord] - mapPos[coord]) * deltaDist[coord]
         end
       else
         step[coord] = 1
-        sideDist[coord] = (mapPos[coord] + 1 - pos[coord]) * deltaDist[coord]
+        sideDist[coord] = (mapPos[coord] + 1 - player.pos[coord]) * deltaDist[coord]
       end
     end
 
@@ -66,7 +66,7 @@ function draw_rays()
 
     -- calculate distance to wall (using camera plane)
     if side then coord = "y" else coord = "x" end
-    wallDist = (mapPos[coord] - pos[coord] + (1 - step[coord]) / 2) / rayDir[coord]
+    wallDist = (mapPos[coord] - player.pos[coord] + (1 - step[coord]) / 2) / rayDir[coord]
     zBuf[x] = wallDist
 
     -- calculate line top and bottom
@@ -78,9 +78,9 @@ function draw_rays()
     if useTextures then
       -- calculate the x coordinate of the wall where the ray hit
       if side then
-        wallX = pos.x + wallDist * rayDir.x
+        wallX = player.pos.x + wallDist * rayDir.x
       else
-        wallX = pos.y + wallDist * rayDir.y
+        wallX = player.pos.y + wallDist * rayDir.y
       end
 
       wallX -= flr(wallX)
@@ -107,13 +107,13 @@ function draw_rays()
   if useSprites then
     -- TODO: sort sprites from far to close
     for doggo in all(doggos) do
-      sprite = {x = doggo.x - pos.x, y = doggo.y - pos.y}
+      sprite = {x = doggo.x - player.pos.x, y = doggo.y - player.pos.y}
 
       -- transform sprite
-      invDet = 1 / (plane.x * dir.y - dir.x * plane.y)
+      invDet = 1 / (plane.x * player.dir.y - player.dir.x * plane.y)
 
       transform = {
-        x = invDet * (dir.y * sprite.x - dir.x * sprite.y),
+        x = invDet * (player.dir.y * sprite.x - player.dir.x * sprite.y),
         y = invDet * (-plane.y * sprite.x + plane.x * sprite.y)
       }
 

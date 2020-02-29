@@ -1,5 +1,14 @@
+function init_player()
+  player = {
+    pos = {},
+    dir = {},
+    score = 0,
+    ammo = 10
+  }
+end
+
 function move()
-  oldDir = dir
+  oldDir = player.dir
   oldPlane = plane
 
   if btn(0) and not btn(4) then rotate_left()   end
@@ -11,43 +20,43 @@ function move()
 end
 
 function rotate_left()
-  dir = { x = oldDir.x * cos(-rotSpeed) - oldDir.y * sin(-rotSpeed),
-          y = oldDir.x * sin(-rotSpeed) + oldDir.y * cos(-rotSpeed) }
+  player.dir = { x = oldDir.x * cos(-rotSpeed) - oldDir.y * sin(-rotSpeed),
+                 y = oldDir.x * sin(-rotSpeed) + oldDir.y * cos(-rotSpeed) }
   plane = { x = oldPlane.x * cos(-rotSpeed) - oldPlane.y * sin(-rotSpeed),
             y = oldPlane.x * sin(-rotSpeed) + oldPlane.y * cos(-rotSpeed) }
 end
 
 function rotate_right()
-  dir = { x = oldDir.x * cos(rotSpeed) - oldDir.y * sin(rotSpeed),
-          y = oldDir.x * sin(rotSpeed) + oldDir.y * cos(rotSpeed) }
+  player.dir = { x = oldDir.x * cos(rotSpeed) - oldDir.y * sin(rotSpeed),
+                 y = oldDir.x * sin(rotSpeed) + oldDir.y * cos(rotSpeed) }
   plane = { x = oldPlane.x * cos(rotSpeed) - oldPlane.y * sin(rotSpeed),
             y = oldPlane.x * sin(rotSpeed) + oldPlane.y * cos(rotSpeed) }
 end
 
 function walk_forward()
-  if world[flr(pos.x + dir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x += dir.x * moveSpeed end
-  if world[flr(pos.x)][flr(pos.y + dir.y * moveSpeed)] == 0 then pos.y += dir.y * moveSpeed end
+  if world[flr(player.pos.x + player.dir.x * moveSpeed)][flr(player.pos.y)] == 0 then player.pos.x += player.dir.x * moveSpeed end
+  if world[flr(player.pos.x)][flr(player.pos.y + player.dir.y * moveSpeed)] == 0 then player.pos.y += player.dir.y * moveSpeed end
 end
 
 function walk_backward()
-  if world[flr(pos.x - dir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x -= dir.x * moveSpeed end
-  if world[flr(pos.x)][flr(pos.y - dir.y * moveSpeed)] == 0 then pos.y -= dir.y * moveSpeed end
+  if world[flr(player.pos.x - player.dir.x * moveSpeed)][flr(player.pos.y)] == 0 then player.pos.x -= player.dir.x * moveSpeed end
+  if world[flr(player.pos.x)][flr(player.pos.y - player.dir.y * moveSpeed)] == 0 then player.pos.y -= player.dir.y * moveSpeed end
 end
 
 function strafe_left()
-  moveDir = { x = dir.x * cos(0.25) - dir.y * sin(0.25),
-              y = dir.x * sin(0.25) + dir.y * cos(0.25) }
+  moveDir = { x = player.dir.x * cos(0.25) - player.dir.y * sin(0.25),
+              y = player.dir.x * sin(0.25) + player.dir.y * cos(0.25) }
 
-  if world[flr(pos.x - moveDir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x -= moveDir.x * moveSpeed end
-  if world[flr(pos.x)][flr(pos.y - moveDir.y * moveSpeed)] == 0 then pos.y -= moveDir.y * moveSpeed end
+  if world[flr(player.pos.x - moveDir.x * moveSpeed)][flr(player.pos.y)] == 0 then player.pos.x -= moveDir.x * moveSpeed end
+  if world[flr(player.pos.x)][flr(player.pos.y - moveDir.y * moveSpeed)] == 0 then player.pos.y -= moveDir.y * moveSpeed end
 end
 
 function strafe_right()
-  moveDir = { x = dir.x * cos(0.25) - dir.y * sin(0.25),
-              y = dir.x * sin(0.25) + dir.y * cos(0.25) }
+  moveDir = { x = player.dir.x * cos(0.25) - player.dir.y * sin(0.25),
+              y = player.dir.x * sin(0.25) + player.dir.y * cos(0.25) }
 
-  if world[flr(pos.x + moveDir.x * moveSpeed)][flr(pos.y)] == 0 then pos.x += moveDir.x * moveSpeed end
-  if world[flr(pos.x)][flr(pos.y + moveDir.y * moveSpeed)] == 0 then pos.y += moveDir.y * moveSpeed end
+  if world[flr(player.pos.x + moveDir.x * moveSpeed)][flr(player.pos.y)] == 0 then player.pos.x += moveDir.x * moveSpeed end
+  if world[flr(player.pos.x)][flr(player.pos.y + moveDir.y * moveSpeed)] == 0 then player.pos.y += moveDir.y * moveSpeed end
 end
 
 function give_treat()
@@ -59,8 +68,12 @@ function give_treat()
     if treatY < 90 then
       -- treat successfully given
       for doggo in all(doggos) do
-        doggoDistance = (pos.x - doggo.x) * (pos.x - doggo.x) + (pos.y - doggo.y) * (pos.y - doggo.y)
-        if doggoDistance < 7 then doggo.spriteY = 32 end
+        doggoDistance = (player.pos.x - doggo.x) * (player.pos.x - doggo.x) + (player.pos.y - doggo.y) * (player.pos.y - doggo.y)
+        if doggoDistance < 7 then
+          doggo.spriteY = 32
+          player.ammo -= 1
+          player.score += 50
+        end
       end
     end
 

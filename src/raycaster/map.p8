@@ -17,8 +17,8 @@ function init_map()
       elseif pixel == 8 then  -- red wall
         world[worldX][worldY] = 3
       elseif pixel == 11 then -- player
-        pos = {x = worldX + 0.5, y = worldY}
-        dir = {x = 0, y = 1}
+        player.pos = {x = worldX + 0.5, y = worldY}
+        player.dir = {x = 0, y = 1}
         plane = {x = 0.66, y = 0}
       elseif pixel == 9 then  -- doggo
         add(doggos, {x = worldX + 0.5, y = worldY + 0.5, spriteY = 0})
