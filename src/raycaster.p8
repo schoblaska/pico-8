@@ -8,12 +8,18 @@ __lua__
 -- [x] wall textures
 -- [x] minimap
 -- [x] sprites
+-- [x] give treats to dogs
 -- [ ] sort sprites by distance to player
--- [x] interaction with sprites
+-- [ ] more sprites
+-- [ ] pick up treats before giving
+-- [ ] bottom-of-screen ui
+-- [ ] recreate wolf3d 1-1 map
+-- [ ] method to step through demo (raycasting screen, flat and buggy, flat, textured, sprites)
 -- [ ] map editor
 -- [ ] title screen
 -- [ ] music
 -- [ ] raycasting explanation screen
+-- [ ] when "wielding" treats, show on bottom of screen and bob when walking
 
 #include raycaster/rays.p8
 #include raycaster/player.p8

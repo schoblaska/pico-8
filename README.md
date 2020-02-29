@@ -53,3 +53,5 @@ mv src/gamename.js docs/
 * [Famous characters as PICO-8 sprites](https://twitter.com/johanvinet/status/635814153601597441)
 * [Food and drink sprites](https://twitter.com/JUSTIN_CYR/status/634546317713391616)
 * [Curated list of resources](https://github.com/pico-8/awesome-PICO-8#resources)
+* [Lode's Computer Graphics Tutorial](https://lodev.org/cgtutor/index.html)
+* [PICO-8 Lighting](https://hackernoon.com/pico-8-lighting-part-1-thin-dark-line-8ea15d21fed7)
