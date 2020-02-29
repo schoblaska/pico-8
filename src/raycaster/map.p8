@@ -16,6 +16,8 @@ function init_map()
         world[worldX][worldY] = 2
       elseif pixel == 8 then  -- red wall
         world[worldX][worldY] = 3
+      elseif pixel == 1 then  -- prison wall
+        world[worldX][worldY] = 4
       elseif pixel == 11 then -- player
         player.pos = {x = worldX + 0.5, y = worldY}
         player.dir = {x = 0, y = 1}

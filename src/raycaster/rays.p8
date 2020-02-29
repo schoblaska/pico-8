@@ -8,7 +8,8 @@ local texOrigins = {
   {x = 0,  y = 32},
   {x = 32, y = 32},
   {x = 0,  y = 64},
-  {x = 32, y = 64}
+  {x = 32, y = 64},
+  {x = 0,  y = 96}
 }
 
 function draw_rays()
@@ -97,6 +98,7 @@ function draw_rays()
       sx = texOrigins[texNum].x + texX
       dy = -lineHeight / 2 + 64
 
+      line(x, drawTop, x, drawBot, 0)
       sspr(sx, texOrigins[texNum].y, 1, 32, x, dy, 1, lineHeight)
     else
       line(x, drawTop, x, drawBot, wall_color(wall, side))
@@ -151,6 +153,8 @@ function wall_color(wall, side)
   elseif wall == 2 and not side then return 13
   elseif wall == 3 and     side then return 8
   elseif wall == 3 and not side then return 2
+  elseif wall == 4 and     side then return 12
+  elseif wall == 4 and not side then return 13
   else                               return 7
   end
 end
@@ -162,6 +166,7 @@ function wall_texture(wall, side)
   elseif wall == 2 and not side then return 4
   elseif wall == 3 and     side then return 5
   elseif wall == 3 and not side then return 6
+  elseif wall == 4              then return 7
   else                               return 1
   end
 end
