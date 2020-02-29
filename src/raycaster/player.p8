@@ -69,7 +69,7 @@ function give_treat()
       -- treat successfully given
       for doggo in all(doggos) do
         doggoDistance = (player.pos.x - doggo.x) * (player.pos.x - doggo.x) + (player.pos.y - doggo.y) * (player.pos.y - doggo.y)
-        if doggoDistance < 7 then
+        if doggoDistance < 7 and doggo.spriteY == 0 then
           doggo.spriteY = 32
           player.ammo -= 1
           player.score += 50
