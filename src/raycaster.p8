@@ -13,7 +13,7 @@ __lua__
 -- [x] recreate wolf3d 1-1 map
 -- [x] bottom-of-screen ui
 -- [x] "accent" walls
--- [ ] raycasting explanation screen
+-- [x] raycasting explanation screen
 -- [ ] sort sprites by distance to player
 -- [ ] more sprites
 
@@ -139,27 +139,39 @@ function draw_raycasting_slide()
   rectfill(0, 0, 127, 85, 7)
 
   -- 2d walls
-  rectfill(32, 8, 119, 16, 12)
-  rectfill(111, 8, 119, 64, 12)
+  rectfill(19, 8, 106, 16, 12)
+  rectfill(98, 8, 106, 64, 12)
 
   -- rays
-  line(33, 68, 38, 17, 14)
-  line(33, 68, 60, 17, 14)
-  line(33, 68, 106, 17, 14)
-  line(33, 68, 110, 58, 14)
+  line(20, 68, 25, 17, 14)
+  line(20, 68, 47, 17, 14)
+  line(20, 68, 93, 17, 14)
+  line(20, 68, 97, 58, 14)
 
   -- player
-  circfill(33, 68, 2, 11)
+  circfill(20, 68, 2, 11)
 
   -- screen
-  line(35, 45, 55, 65, 5)
+  line(22, 45, 42, 65, 5)
 
   -- labels
-  print("raycasting", 81, 74, 0)
-  print("walls", 64, 10, 7)
-  print("rays", 76, 42, 14)
-  print("player", 31, 74, 11)
-  print("screen", 54, 56, 5)
+  print("walls", 51, 10, 7)
+  print("rays", 63, 42, 14)
+  print("player", 18, 74, 11)
+  print("screen", 41, 56, 5)
+
+  -- 3d walls
+  line(0, 100, 96, 103, 12)
+  line(0, 101, 96, 103, 12)
+  line(0, 102, 96, 103, 12)
+  rectfill(0, 103, 96, 113, 12)
+  line(0, 114, 96, 113, 12)
+  line(0, 115, 96, 113, 12)
+  line(0, 116, 96, 113, 12)
+
+  line(97, 103, 127, 102, 13)
+  rectfill(97, 103, 127, 113, 13)
+  line(97, 113, 127, 114, 13)
 end
 
 __gfx__
