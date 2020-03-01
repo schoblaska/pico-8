@@ -99,7 +99,7 @@ function _draw()
   cls()
 
   if mode == 0 then
-    print "raycaster explanation slide" -- placeholder
+    draw_raycasting_slide()
   elseif mode == 1 then
     draw_rays()
     draw_instructions()
@@ -131,6 +131,35 @@ function draw_instructions()
   else
     if showCPU then print("cpu: " .. stat(1), 1, 1, 6) end
   end
+end
+
+function draw_raycasting_slide()
+  -- background
+  rectfill(0, 0, 127, 127, 0)
+  rectfill(0, 0, 127, 85, 7)
+
+  -- 2d walls
+  rectfill(32, 8, 119, 16, 12)
+  rectfill(111, 8, 119, 64, 12)
+
+  -- rays
+  line(33, 68, 38, 17, 14)
+  line(33, 68, 60, 17, 14)
+  line(33, 68, 106, 17, 14)
+  line(33, 68, 110, 58, 14)
+
+  -- player
+  circfill(33, 68, 2, 11)
+
+  -- screen
+  line(35, 45, 55, 65, 5)
+
+  -- labels
+  print("raycasting", 81, 74, 0)
+  print("walls", 64, 10, 7)
+  print("rays", 76, 42, 14)
+  print("player", 31, 74, 11)
+  print("screen", 54, 56, 5)
 end
 
 __gfx__
