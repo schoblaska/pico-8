@@ -23,6 +23,7 @@ __lua__
 -- [ ] when "wielding" treats, show on bottom of screen and bob when walking
 -- [ ] doors (use sprites that don't rotate?)
 -- [ ] only succeed to give treat if dog is in front of player
+-- [ ] sound effects
 
 #include raycaster/map.p8
 #include raycaster/player.p8
