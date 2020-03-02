@@ -40,7 +40,7 @@ function _init()
   showInstructions = 150
   givingTreat = false
   treatY = 128
-  mode = 0
+  mode = 1
 end
 
 function _update()
