@@ -36,10 +36,11 @@ function _init()
   init_sprites()
   init_player()
   init_map()
-  init_title()
+  init_decompressor()
 
-  load_title()
+  load_splash()
 
+  showSplash = 45
   rotSpeed = 0.01
   moveSpeed = 0.25
   showInstructions = 150
@@ -50,6 +51,14 @@ end
 
 function _update()
   if mode == 0 then
+    -- splash screen
+    if showSplash <= 0 then
+      load_title()
+      mode += 1
+    else
+      showSplash -= 1
+    end
+  elseif mode == 1 then
     -- title slide
     if btnp() > 0 then
       reload(0,0,8192)
@@ -67,8 +76,10 @@ function _draw()
   cls()
 
   if mode == 0 then
-    draw_title()
+    draw_splash()
   elseif mode == 1 then
+    draw_title()
+  elseif mode == 2 then
     draw_rays()
     draw_treat()
     draw_ui()

@@ -7,7 +7,7 @@
 -- to draw graphics memory onto screen: sspr(0,0,128,128,0,0)
 -- to reset graphics memory: reload(0,0,8192)
 
-function init_compressor_mem()
+function init_decompressor()
  chars="!#$%&'()*+,-/0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[]^_`{|}~"
  if #chars < 64 then error("this won't work") end
  s2c={}
