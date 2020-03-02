@@ -24,6 +24,10 @@ function init_map()
         plane = {x = 0.66, y = 0}
       elseif pixel == 9 then  -- doggo
         add(objects, {sprite = sprites.dogAngry, x = worldX + 0.5, y = worldY + 0.5})
+      elseif pixel == 10 then -- light
+        add(objects, {sprite = sprites.light, x = worldX + 0.5, y = worldY + 0.5})
+      elseif pixel == 3 then  -- chest
+        add(objects, {sprite = sprites.chest, x = worldX + 0.5, y = worldY + 0.5})
       end
     end
   end

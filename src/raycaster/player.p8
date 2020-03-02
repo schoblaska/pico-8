@@ -86,3 +86,12 @@ end
 function draw_treat()
   sspr(64, 64, 32, 32, 48, treatY, 32, 32)
 end
+
+function get_treasure()
+  for object in all(objects) do
+    if object.sprite == sprites.chest and flr(object.x) == flr(player.pos.x) and flr(object.y) == flr(player.pos.y) then
+      player.score += 50
+      del(objects, object)
+    end
+  end
+end
