@@ -4,10 +4,10 @@ Messing around with the [PICO-8](http://pico-8.com).
 <table>
   <tr>
     <td valign="top">
-      <a href="https://joeyschoblaska.github.io/pico-8/raycaster.html">
-        <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/carts/raycaster.p8.png" align="right">
+      <a href="https://joeyschoblaska.github.io/pico-8/hundstein.html">
+        <img src="https://raw.githubusercontent.com/joeyschoblaska/pico-8/master/carts/hundstein.p8.png" align="right">
       </a>
-      <h3>Raycaster</h3>
+      <h3>Hundstein</h3>
       <p>An experiment using raycasting to create a Wolfenstein 3D like engine in PICO-8.</p>
       <ul>
         <li><a href="https://lodev.org/cgtutor/raycasting.html">Lode's Computer Graphics Tutorial: Raycasting</a></li>
