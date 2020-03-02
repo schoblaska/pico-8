@@ -60,8 +60,8 @@ function _update()
     end
   elseif mode == 1 then
     -- title slide
-    if btnp() > 0 then
-      reload(0,0,8192)
+    if btnp(4) or btnp(5) then
+      reload(0, 0, 8192) -- reload gfx memory
       mode += 1
     end
   elseif mode == 1 then

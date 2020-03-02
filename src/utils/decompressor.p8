@@ -3,9 +3,9 @@
 -- compressor will convert image to str and put into clipboard
 -- in game code: include decompressor and store image string in variable
 -- call init_compressor_mem() in _init()
--- to load string into graphics memory: str2mem(rld(image_str), 0)
--- to draw graphics memory onto screen: sspr(0,0,128,128,0,0)
--- to reset graphics memory: reload(0,0,8192)
+-- to load string into graphics memory: str2mem(image_str, 0)
+-- to draw graphics memory onto screen: sspr(0, 0, 128, 128, 0, 0)
+-- to reset graphics memory: reload(0, 0, 8192)
 
 function init_decompressor()
  chars="!#$%&'()*+,-/0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[]^_`{|}~"
@@ -44,6 +44,7 @@ function rld(t)
 end
 
 function str2mem(s,m)
+  s = rld(s)
   local i = 1
   local rem = #s
 
