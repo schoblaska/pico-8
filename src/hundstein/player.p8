@@ -74,6 +74,7 @@ function give_treat()
             object.sprite = sprites.dogHappy
             player.ammo -= 1
             player.score += 50
+            showInstructions = false
           end
         end
       end

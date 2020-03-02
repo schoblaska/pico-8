@@ -43,7 +43,7 @@ function _init()
   showSplash = 45
   rotSpeed = 0.01
   moveSpeed = 0.25
-  showInstructions = 150
+  showInstructions = true
   givingTreat = false
   treatY = 128
   mode = 0
@@ -65,7 +65,6 @@ function _update()
       mode += 1
     end
   elseif mode == 2 then
-    update_instructions()
     move()
     give_treat()
     get_treasure()
@@ -83,12 +82,8 @@ function _draw()
     draw_rays()
     draw_treat()
     draw_ui()
-    if showInstructions > 0 then draw_instructions() end
+    if showInstructions then draw_instructions() end
   end
-end
-
-function update_instructions()
-  if showInstructions > 0 then showInstructions -= 1 end
 end
 
 function draw_instructions()
