@@ -67,12 +67,14 @@ function give_treat()
   else
     if treatY < 90 then
       -- treat successfully given
-      for doggo in all(doggos) do
-        doggoDistance = (player.pos.x - doggo.x) * (player.pos.x - doggo.x) + (player.pos.y - doggo.y) * (player.pos.y - doggo.y)
-        if doggoDistance < 7 and doggo.spriteY == 0 then
-          doggo.spriteY = 32
-          player.ammo -= 1
-          player.score += 50
+      for object in all(objects) do
+        if object.sprite == sprites.dogAngry then
+          distance = (player.pos.x - object.x) * (player.pos.x - object.x) + (player.pos.y - object.y) * (player.pos.y - object.y)
+          if distance < 7 then
+            object.sprite = sprites.dogHappy
+            player.ammo -= 1
+            player.score += 50
+          end
         end
       end
     end

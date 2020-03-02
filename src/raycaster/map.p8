@@ -1,6 +1,6 @@
 function init_map()
   world = {}
-  doggos = {}
+  objects = {}
 
   for mapX = 96, 127 do
     worldX = mapX - 95
@@ -23,7 +23,7 @@ function init_map()
         player.dir = {x = 0, y = 1}
         plane = {x = 0.66, y = 0}
       elseif pixel == 9 then  -- doggo
-        add(doggos, {x = worldX + 0.5, y = worldY + 0.5, spriteY = 0})
+        add(objects, {sprite = sprites.dogAngry, x = worldX + 0.5, y = worldY + 0.5})
       end
     end
   end

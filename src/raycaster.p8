@@ -24,12 +24,14 @@ __lua__
 -- [ ] doors (use sprites that don't rotate?)
 -- [ ] only succeed to give treat if dog is in front of player
 
-#include raycaster/rays.p8
-#include raycaster/player.p8
 #include raycaster/map.p8
+#include raycaster/player.p8
+#include raycaster/rays.p8
+#include raycaster/sprites.p8
 #include raycaster/ui.p8
 
 function _init()
+  init_sprites()
   init_player()
   init_map()
 
