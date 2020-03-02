@@ -143,10 +143,12 @@ function draw_raycasting_slide()
   rectfill(98, 8, 106, 64, 12)
 
   -- rays
-  line(20, 68, 25, 17, 14)
-  line(20, 68, 47, 17, 14)
-  line(20, 68, 93, 17, 14)
-  line(20, 68, 97, 58, 14)
+  rayColors = {14, 14, 14, 14}
+  rayColors[flr(time()) % 4 + 1] = 8
+  line(20, 68, 25, 17, rayColors[1])
+  line(20, 68, 47, 17, rayColors[2])
+  line(20, 68, 93, 17, rayColors[3])
+  line(20, 68, 97, 58, rayColors[4])
 
   -- player
   circfill(20, 68, 2, 11)
@@ -178,6 +180,15 @@ function draw_raycasting_slide()
   line(97, 103, 127, 102, 13)
   rectfill(97, 103, 127, 113, 13)
   line(97, 113, 127, 114, 13)
+
+  -- vertical lines
+  vLineColors = {12, 12, 12, 13}
+  vLineColors[flr(time()) % 4 + 1] = 8
+  line(2, 97, 2, 119, vLineColors[1])
+  line(38, 99, 38, 117, vLineColors[2])
+  line(76, 102, 76, 114, vLineColors[3])
+  line(125, 102, 125, 114, vLineColors[4])
+
 end
 
 __gfx__
