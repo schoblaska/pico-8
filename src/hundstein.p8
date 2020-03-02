@@ -14,10 +14,10 @@ __lua__
 -- [x] "accent" walls
 -- [x] raycasting explanation screen
 -- [x] more sprites
+-- [x] title screen
 
 -- [ ] sort sprites by distance to player
 -- [ ] pick up treats before giving
--- [ ] title screen
 -- [ ] music
 -- [ ] when "wielding" treats, show on bottom of screen and bob when walking
 -- [ ] doors (use sprites that don't rotate?)
@@ -64,7 +64,7 @@ function _update()
       reload(0, 0, 8192) -- reload gfx memory
       mode += 1
     end
-  elseif mode == 1 then
+  elseif mode == 2 then
     update_instructions()
     move()
     give_treat()
@@ -83,7 +83,7 @@ function _draw()
     draw_rays()
     draw_treat()
     draw_ui()
-    draw_instructions()
+    if showInstructions > 0 then draw_instructions() end
   end
 end
 
@@ -92,10 +92,8 @@ function update_instructions()
 end
 
 function draw_instructions()
-  if showInstructions > 0 then
-    print("hold z to strafe", 1, 1, 6)
-    print("hold x to give treat", 1, 8, 6)
-  end
+  print("hold z to strafe", 1, 1, 6)
+  print("hold x to give treat", 1, 8, 6)
 end
 
 __gfx__
