@@ -24,29 +24,37 @@ __lua__
 -- [ ] only succeed to give treat if dog is in front of player
 -- [ ] sound effects
 
+#include utils/decompressor.p8
 #include hundstein/map.p8
 #include hundstein/player.p8
 #include hundstein/rays.p8
 #include hundstein/sprites.p8
+#include hundstein/title.p8
 #include hundstein/ui.p8
 
 function _init()
   init_sprites()
   init_player()
   init_map()
+  init_title()
+
+  load_title()
 
   rotSpeed = 0.01
   moveSpeed = 0.25
   showInstructions = 150
   givingTreat = false
   treatY = 128
-  mode = 1
+  mode = 0
 end
 
 function _update()
   if mode == 0 then
     -- title slide
-    if btnp() > 0 then mode += 1 end
+    if btnp() > 0 then
+      reload(0,0,8192)
+      mode += 1
+    end
   elseif mode == 1 then
     update_instructions()
     move()
@@ -59,7 +67,7 @@ function _draw()
   cls()
 
   if mode == 0 then
-    print("title screen goes here", 1, 1, 5)
+    draw_title()
   elseif mode == 1 then
     draw_rays()
     draw_treat()
