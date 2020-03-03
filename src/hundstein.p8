@@ -40,7 +40,7 @@ function _init()
 
   load_splash()
 
-  showSplash = 45
+  showSplash = 90
   rotSpeed = 0.01
   moveSpeed = 0.25
   showInstructions = true
