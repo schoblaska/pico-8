@@ -95,8 +95,21 @@ function draw_rays()
     sspr(sx, texOrigins[texNum].y, 1, 32, x, dy, 1, lineHeight)
   end
 
-  -- sprites
-  -- TODO: sort sprites from far to close
+  -- calculate distance to player for each sprite
+  for spriteInstance in all(spriteInstances) do
+    spriteInstance.distanceToPlayer = distance(player.pos, spriteInstance)
+  end
+
+  -- sort sprites based on distance to player
+  for i = 1, #spriteInstances do
+    local j = i
+    while j > 1 and spriteInstances[j-1].distanceToPlayer < spriteInstances[j].distanceToPlayer do
+      spriteInstances[j], spriteInstances[j - 1] = spriteInstances[j - 1], spriteInstances[j]
+      j = j - 1
+    end
+  end
+
+  -- draw sprites
   for spriteInstance in all(spriteInstances) do
     spriteInstance.rX = spriteInstance.x - player.pos.x
     spriteInstance.rY = spriteInstance.y - player.pos.y

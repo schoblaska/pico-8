@@ -15,8 +15,8 @@ __lua__
 -- [x] raycasting explanation screen
 -- [x] more sprites
 -- [x] title screen
+-- [x] sort sprites by distance to player
 
--- [ ] sort sprites by distance to player
 -- [ ] pick up treats before giving
 -- [ ] music
 -- [ ] when "wielding" treats, show on bottom of screen and bob when walking
@@ -54,7 +54,7 @@ end
 function _update()
   if mode == 0 then
     -- splash screen
-    if showSplash <= 0 then
+    if showSplash <= 0 or btnp() > 0 then
       load_title()
       mode += 1
     else
