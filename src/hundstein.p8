@@ -25,6 +25,8 @@ __lua__
 -- [ ] sound effects
 
 #include utils/decompressor.p8
+#include utils/distance.p8
+
 #include hundstein/map.p8
 #include hundstein/player.p8
 #include hundstein/rays.p8

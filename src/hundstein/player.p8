@@ -69,8 +69,7 @@ function give_treat()
       -- treat successfully given
       for spriteInstance in all(spriteInstances) do
         if spriteInstance.sprite == sprites.dogAngry then
-          distance = (player.pos.x - spriteInstance.x) * (player.pos.x - spriteInstance.x) + (player.pos.y - spriteInstance.y) * (player.pos.y - spriteInstance.y)
-          if distance < 7 then
+          if distance(player.pos, spriteInstance) < 7 then
             spriteInstance.sprite = sprites.dogHappy
             player.ammo -= 1
             player.score += 50
