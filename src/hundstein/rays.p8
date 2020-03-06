@@ -97,40 +97,40 @@ function draw_rays()
 
   -- sprites
   -- TODO: sort sprites from far to close
-  for object in all(objects) do
-    object.rX = object.x - player.pos.x
-    object.rY = object.y - player.pos.y
+  for spriteInstance in all(spriteInstances) do
+    spriteInstance.rX = spriteInstance.x - player.pos.x
+    spriteInstance.rY = spriteInstance.y - player.pos.y
 
     -- transform sprite
     invDet = 1 / (plane.x * player.dir.y - player.dir.x * plane.y)
 
     transform = {
-      x = invDet * (player.dir.y * object.rX - player.dir.x * object.rY),
-      y = invDet * (-plane.y * object.rX + plane.x * object.rY)
+      x = invDet * (player.dir.y * spriteInstance.rX - player.dir.x * spriteInstance.rY),
+      y = invDet * (-plane.y * spriteInstance.rX + plane.x * spriteInstance.rY)
     }
 
     -- params for scaling and moving sprite
-    vMoveScreen = flr(object.sprite.vMove / transform.y)
+    vMoveScreen = flr(spriteInstance.sprite.vMove / transform.y)
 
     spriteScreenX = flr(64 * (1 + transform.x / transform.y))
-    spriteHeight = abs(flr(128 / transform.y)) * object.sprite.vScale
+    spriteHeight = abs(flr(128 / transform.y)) * spriteInstance.sprite.vScale
     drawStartY = flr(-spriteHeight / 2 + 64) + vMoveScreen
 
-    spriteWidth = abs(flr(128 / transform.y)) * object.sprite.hScale
+    spriteWidth = abs(flr(128 / transform.y)) * spriteInstance.sprite.hScale
     drawStartX = flr(max(0, -spriteWidth / 2 + spriteScreenX))
     drawEndX = flr(min(127, spriteWidth / 2 + spriteScreenX))
 
     for stripe = drawStartX, drawEndX do
-      if object.sprite.animated and flr(time()) % 2 == 0 then
-        texOffset = object.sprite.x + object.sprite.w
+      if spriteInstance.sprite.animated and flr(time()) % 2 == 0 then
+        texOffset = spriteInstance.sprite.x + spriteInstance.sprite.w
       else
-        texOffset = object.sprite.x
+        texOffset = spriteInstance.sprite.x
       end
 
       if transform.y > 0 and transform.y < zBuf[stripe] then
-        texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * object.sprite.w / spriteWidth)
-        texX = min(max(0, texX), object.sprite.w - 1)
-        sspr(texX + texOffset, object.sprite.y, 1, object.sprite.h, stripe, drawStartY, 1, spriteHeight)
+        texX = flr((stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteInstance.sprite.w / spriteWidth)
+        texX = min(max(0, texX), spriteInstance.sprite.w - 1)
+        sspr(texX + texOffset, spriteInstance.sprite.y, 1, spriteInstance.sprite.h, stripe, drawStartY, 1, spriteHeight)
       end
     end
   end

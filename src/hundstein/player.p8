@@ -67,11 +67,11 @@ function give_treat()
   else
     if treatY < 90 then
       -- treat successfully given
-      for object in all(objects) do
-        if object.sprite == sprites.dogAngry then
-          distance = (player.pos.x - object.x) * (player.pos.x - object.x) + (player.pos.y - object.y) * (player.pos.y - object.y)
+      for spriteInstance in all(spriteInstances) do
+        if spriteInstance.sprite == sprites.dogAngry then
+          distance = (player.pos.x - spriteInstance.x) * (player.pos.x - spriteInstance.x) + (player.pos.y - spriteInstance.y) * (player.pos.y - spriteInstance.y)
           if distance < 7 then
-            object.sprite = sprites.dogHappy
+            spriteInstance.sprite = sprites.dogHappy
             player.ammo -= 1
             player.score += 50
             showInstructions = false
@@ -89,10 +89,10 @@ function draw_treat()
 end
 
 function get_treasure()
-  for object in all(objects) do
-    if object.sprite == sprites.chest and flr(object.x) == flr(player.pos.x) and flr(object.y) == flr(player.pos.y) then
+  for spriteInstance in all(spriteInstances) do
+    if spriteInstance.sprite == sprites.chest and flr(spriteInstance.x) == flr(player.pos.x) and flr(spriteInstance.y) == flr(player.pos.y) then
       player.score += 50
-      del(objects, object)
+      del(spriteInstances, spriteInstance)
     end
   end
 end
