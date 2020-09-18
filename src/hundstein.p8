@@ -23,6 +23,7 @@ __lua__
 -- [ ] doors (use sprites that don't rotate?)
 -- [ ] only succeed to give treat if dog is in front of player
 -- [ ] sound effects
+-- [ ] make the screen flash when picking up treasure
 
 #include utils/decompressor.p8
 #include utils/distance.p8
