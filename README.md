@@ -55,4 +55,5 @@ mv src/gamename.js docs/
 * [Curated list of resources](https://github.com/pico-8/awesome-PICO-8#resources)
 * [Lode's Computer Graphics Tutorial](https://lodev.org/cgtutor/index.html)
 * [PICO-8 Lighting](https://hackernoon.com/pico-8-lighting-part-1-thin-dark-line-8ea15d21fed7)
+  * (Note that [`tline()`](https://pico-8.fandom.com/wiki/Tline) was introduced to PICO-8 after this article was written and may make some parts easier to implement.)
 * [LOSPEC](https://lospec.com/): Pixel art palettes, tutorials, and assets
