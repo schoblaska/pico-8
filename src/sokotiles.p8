@@ -7,6 +7,7 @@ __lua__
 
 function _init()
   board_buffer = 3
+  cleared_post_win = false
   sprites = {
     e = { 60, 12 },
     w = { 38, 12 },
@@ -98,6 +99,14 @@ function move_player(from_x, from_y, to_x, to_y)
 end
 
 function _draw()
+  if is_won() and not cleared_post_win then
+    cleared_post_win = true
+    cls()
+    rectfill(0, 0, 127, 127, 0)
+  elseif not is_won() then
+    cleared_post_win = false
+  end
+
   draw_twinkles()
   print("sokotiles", 14, 8, 7)
   draw_board()
@@ -125,7 +134,7 @@ function is_won()
 end
 
 function draw_twinkles()
-  local times = is_won() and 1000 or 1
+  local times = is_won() and 10 or 1
 
   for i = 1, times do
     local is_black = rnd(20) < 19
@@ -141,7 +150,11 @@ function draw_board()
       local board_tile = board[y][x]
       local piece_tile = pieces[y][x]
 
-      draw_square(sprites[board_tile], x, y)
+      if is_won() and board_tile ~= "e" then
+        draw_square(sprites[board_tile], x, y)
+      elseif not is_won() then
+        draw_square(sprites[board_tile], x, y)
+      end
 
       if piece_tile ~= "." then
         draw_square(sprites[piece_tile], x, y)
