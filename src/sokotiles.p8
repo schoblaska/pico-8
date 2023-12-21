@@ -110,9 +110,6 @@ function draw_twinkles()
 end
 
 function draw_board()
-  -- border
-  rectfill(board_buffer + 8, board_buffer + 8, board_buffer + 112, board_buffer + 112, 5)
-
   for x = 1, 9 do
     for y = 1, 9 do
       local board_tile = board[y][x]
