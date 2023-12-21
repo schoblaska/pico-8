@@ -59,7 +59,7 @@ function _update()
     attempt_move(0, -1)
   elseif btnp(3) then
     attempt_move(0, 1)
-  elseif btnp(5) then
+  elseif btnp(5) and not is_won() then
     _init()
   end
 end
