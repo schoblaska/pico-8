@@ -99,6 +99,7 @@ end
 
 function _draw()
   draw_twinkles()
+  print("sokotiles", 14, 8, 7)
   draw_board()
 end
 
