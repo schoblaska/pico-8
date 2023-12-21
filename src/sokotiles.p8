@@ -21,27 +21,27 @@ function _init()
   }
 
   board = {
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeeeee",
-    "eeeeeewee",
-    "eeeeeeeee"
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "w", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "e", "e" }
   }
 
   pieces = {
-    "..G......",
-    "...EEE...",
-    "......W..",
-    "EEE...E..",
-    ".E.....Y.",
-    "..B....Y.",
-    ".E.......",
-    "...E.....",
-    "........."
+    { ".", ".", "G", ".", ".", ".", ".", ".", "." },
+    { ".", ".", ".", "E", "E", "E", ".", ".", "." },
+    { ".", ".", ".", ".", ".", ".", "W", ".", "." },
+    { "E", "E", "E", ".", ".", ".", "E", ".", "." },
+    { ".", "E", ".", ".", ".", ".", ".", "Y", "." },
+    { ".", ".", "B", ".", ".", ".", ".", "Y", "." },
+    { ".", "E", ".", ".", ".", ".", ".", ".", "." },
+    { ".", ".", ".", "E", ".", ".", ".", ".", "." },
+    { ".", ".", ".", ".", ".", ".", ".", ".", "." }
   }
 
   cls()
@@ -54,6 +54,47 @@ function _init()
 end
 
 function _update()
+  if btnp(0) then
+    attempt_move(-1, 0)
+  elseif btnp(1) then
+    attempt_move(1, 0)
+  elseif btnp(2) then
+    attempt_move(0, -1)
+  elseif btnp(3) then
+    attempt_move(0, 1)
+  end
+end
+
+function find_player()
+  for y = 1, 9 do
+    for x = 1, 9 do
+      if pieces[y][x] == "W" then
+        return x, y
+      end
+    end
+  end
+end
+
+function attempt_move(x, y)
+  local player_x, player_y = find_player()
+
+  local target_x = player_x + x
+  local target_y = player_y + y
+
+  if target_x < 1 or target_x > 9 or target_y < 1 or target_y > 9 then
+    return
+  end
+
+  local target_piece = pieces[target_y][target_x]
+
+  if target_piece == "." then
+    move_player(player_x, player_y, target_x, target_y)
+  end
+end
+
+function move_player(from_x, from_y, to_x, to_y)
+  pieces[from_y][from_x] = "."
+  pieces[to_y][to_x] = "W"
 end
 
 function _draw()
