@@ -23,26 +23,26 @@ function _init()
 
   board = {
     { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "y", "e" },
+    { "e", "e", "e", "e", "e", "e", "e", "y", "e" },
     { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
-    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
-    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
-    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
-    { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "g", "e", "e", "e", "e" },
+    { "e", "e", "e", "e", "e", "e", "b", "e", "e" },
     { "e", "e", "e", "e", "e", "e", "e", "e", "e" },
     { "e", "e", "e", "e", "e", "e", "e", "w", "e" },
     { "e", "e", "e", "e", "e", "e", "e", "e", "e" }
   }
 
   pieces = {
-    { ".", ".", "G", ".", ".", ".", ".", ".", "." },
-    { ".", ".", ".", "E", "E", "E", ".", ".", "." },
+    { ".", ".", ".", ".", ".", ".", ".", ".", "." },
+    { ".", ".", "G", "E", "E", "E", ".", ".", "." },
     { ".", ".", ".", ".", ".", ".", "W", ".", "." },
     { "E", "E", "E", ".", ".", ".", "E", ".", "." },
     { ".", "E", ".", ".", ".", ".", ".", "Y", "." },
     { ".", ".", "B", ".", ".", ".", ".", "Y", "." },
     { ".", "E", ".", ".", ".", ".", ".", ".", "." },
-    { ".", ".", ".", "E", ".", ".", ".", ".", "." },
-    { ".", ".", ".", ".", ".", ".", ".", ".", "." }
+    { ".", ".", ".", "E", ".", ".", ".", ".", "E" },
+    { ".", ".", ".", ".", ".", ".", ".", ".", "E" }
   }
 
   cls()
@@ -109,14 +109,37 @@ function move_if_able(x, y, dx, dy)
   local target_x = x + dx
   local target_y = y + dy
 
+  if able_to_move(x, y, dx, dy) then
+    move_piece(x, y, target_x, target_y)
+    return true
+  else
+    return false
+  end
+end
+
+function able_to_move(x, y, dx, dy)
+  local target_x = x + dx
+  local target_y = y + dy
+
   if target_x < 1 or target_x > 9 or target_y < 1 or target_y > 9 then
     return false
   end
 
+  local piece = pieces[y][x]
   local target_piece = pieces[target_y][target_x]
 
-  if target_piece == "." then
-    move_piece(x, y, target_x, target_y)
+  if piece == "E" then
+    return false
+  elseif piece == "Y" then
+    return dx == 0 and (target_piece == "." or move_if_able(target_x, target_y, dx, dy))
+  elseif piece == "B" then
+    return dy == 0 and (target_piece == "." or move_if_able(target_x, target_y, dx, dy))
+  elseif target_piece == "." then
+    return true
+  elseif move_if_able(target_x, target_y, dx, dy) then
+    return true
+  else
+    return false
   end
 end
 
