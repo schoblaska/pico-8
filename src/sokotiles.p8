@@ -47,11 +47,7 @@ function _init()
 
   cls()
   rectfill(0, 0, 127, 127, 0)
-
-  -- star field
-  for i = 1, 300 do
-    pset(rnd(128), rnd(128), rnd(16))
-  end
+  draw_star_field(1)
 end
 
 function _update()
@@ -73,15 +69,28 @@ function _draw()
     cleared_post_win = true
     cls()
     rectfill(0, 0, 127, 127, 0)
+    draw_star_field(2)
   elseif not is_won() then
+    if cleared_post_win then
+      cls()
+      draw_star_field(1)
+    end
     cleared_post_win = false
   end
 
   draw_twinkles()
-  print("sokotiles", 14, 8, 7)
-  print("x to reset", 74, 8, 5)
-  print("by schoblaska", 62, 114, 5)
+  if not is_won() then
+    print("sokotiles", 14, 8, 7)
+    print("arrows: move", 14, 114, 13)
+    print("x: reset", 82, 114, 13)
+  end
   draw_board()
+end
+
+function draw_star_field(intensity)
+  for i = 1, 300 * intensity do
+    pset(rnd(128), rnd(128), rnd(16))
+  end
 end
 
 function find_player()
