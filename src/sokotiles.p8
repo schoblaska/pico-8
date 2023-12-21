@@ -63,7 +63,25 @@ function _update()
     attempt_move(0, -1)
   elseif btnp(3) then
     attempt_move(0, 1)
+  elseif btnp(5) then
+    _init()
   end
+end
+
+function _draw()
+  if is_won() and not cleared_post_win then
+    cleared_post_win = true
+    cls()
+    rectfill(0, 0, 127, 127, 0)
+  elseif not is_won() then
+    cleared_post_win = false
+  end
+
+  draw_twinkles()
+  print("sokotiles", 14, 8, 7)
+  print("x to reset", 74, 8, 5)
+  print("by schoblaska", 62, 114, 5)
+  draw_board()
 end
 
 function find_player()
@@ -96,20 +114,6 @@ end
 function move_player(from_x, from_y, to_x, to_y)
   pieces[from_y][from_x] = "."
   pieces[to_y][to_x] = "W"
-end
-
-function _draw()
-  if is_won() and not cleared_post_win then
-    cleared_post_win = true
-    cls()
-    rectfill(0, 0, 127, 127, 0)
-  elseif not is_won() then
-    cleared_post_win = false
-  end
-
-  draw_twinkles()
-  print("sokotiles", 14, 8, 7)
-  draw_board()
 end
 
 function is_won()
