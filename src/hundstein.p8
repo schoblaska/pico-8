@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 18
 __lua__
 -- hundstein
--- by thrillhouse
+-- by schoblaska
 
 -- [x] untextured raycasting
 -- [x] wall textures
