@@ -51,14 +51,16 @@ function _init()
 end
 
 function _update()
+  px, py = find_player()
+
   if btnp(0) then
-    attempt_move(-1, 0)
+    move_if_able(px, py, -1, 0)
   elseif btnp(1) then
-    attempt_move(1, 0)
+    move_if_able(px, py, 1, 0)
   elseif btnp(2) then
-    attempt_move(0, -1)
+    move_if_able(px, py, 0, -1)
   elseif btnp(3) then
-    attempt_move(0, 1)
+    move_if_able(px, py, 0, 1)
   elseif btnp(5) and not is_won() then
     _init()
   end
@@ -103,26 +105,26 @@ function find_player()
   end
 end
 
-function attempt_move(x, y)
-  local player_x, player_y = find_player()
-
-  local target_x = player_x + x
-  local target_y = player_y + y
+function move_if_able(x, y, dx, dy)
+  local target_x = x + dx
+  local target_y = y + dy
 
   if target_x < 1 or target_x > 9 or target_y < 1 or target_y > 9 then
-    return
+    return false
   end
 
   local target_piece = pieces[target_y][target_x]
 
   if target_piece == "." then
-    move_player(player_x, player_y, target_x, target_y)
+    move_piece(x, y, target_x, target_y)
   end
 end
 
-function move_player(from_x, from_y, to_x, to_y)
-  pieces[from_y][from_x] = "."
-  pieces[to_y][to_x] = "W"
+function move_piece(x, y, target_x, target_y)
+  local piece = pieces[y][x]
+
+  pieces[y][x] = "."
+  pieces[target_y][target_x] = piece
 end
 
 function is_won()
