@@ -28,12 +28,12 @@ __lua__
 #include utils/decompressor.p8
 #include utils/distance.p8
 
-#include hundstein/map.p8
-#include hundstein/player.p8
-#include hundstein/rays.p8
-#include hundstein/sprites.p8
-#include hundstein/title.p8
-#include hundstein/ui.p8
+#include hund3d/map.p8
+#include hund3d/player.p8
+#include hund3d/rays.p8
+#include hund3d/sprites.p8
+#include hund3d/title.p8
+#include hund3d/ui.p8
 
 function _init()
   init_sprites()
