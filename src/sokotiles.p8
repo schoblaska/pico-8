@@ -103,11 +103,36 @@ function _draw()
   draw_board()
 end
 
-function draw_twinkles()
-  local is_black = rnd(20) < 19
-  local color = is_black and 0 or rnd(15) + 1
+function is_won()
+  for y = 1, 9 do
+    for x = 1, 9 do
+      local board_tile = board[y][x]
+      local piece_tile = pieces[y][x]
 
-  pset(rnd(128), rnd(128), color)
+      if board_tile == "w" and piece_tile ~= "W" then
+        return false
+      elseif board_tile == "g" and piece_tile ~= "G" then
+        return false
+      elseif board_tile == "y" and piece_tile ~= "Y" then
+        return false
+      elseif board_tile == "b" and piece_tile ~= "B" then
+        return false
+      end
+    end
+  end
+
+  return true
+end
+
+function draw_twinkles()
+  local times = is_won() and 1000 or 1
+
+  for i = 1, times do
+    local is_black = rnd(20) < 19
+    local color = is_black and 0 or rnd(15) + 1
+
+    pset(rnd(128), rnd(128), color)
+  end
 end
 
 function draw_board()
