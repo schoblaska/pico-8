@@ -17,7 +17,8 @@ function _init()
     W = { 16, 1 },
     G = { 27, 1 },
     Y = { 27, 12 },
-    B = { 38, 1 }
+    B = { 38, 1 },
+    P = { 60, 12 }
   }
 
   board = {
@@ -37,7 +38,7 @@ function _init()
     { ".", ".", "G", "E", "E", "E", ".", ".", "." },
     { ".", ".", ".", ".", ".", ".", "W", ".", "." },
     { "E", "E", "E", ".", ".", ".", "E", "Y", "." },
-    { ".", "E", ".", ".", ".", ".", ".", "B", "." },
+    { ".", "E", ".", "P", ".", ".", ".", "B", "." },
     { ".", ".", "B", ".", ".", "Y", ".", "Y", "." },
     { ".", "E", ".", ".", ".", ".", ".", ".", "." },
     { ".", ".", ".", "E", ".", ".", ".", ".", "E" },
@@ -53,13 +54,13 @@ function _update()
   px, py = find_player()
 
   if btnp(0) then
-    move_if_able(px, py, -1, 0)
+    move_if_able(px, py, -1, 0, false, false)
   elseif btnp(1) then
-    move_if_able(px, py, 1, 0)
+    move_if_able(px, py, 1, 0, false, false)
   elseif btnp(2) then
-    move_if_able(px, py, 0, -1)
+    move_if_able(px, py, 0, -1, false, false)
   elseif btnp(3) then
-    move_if_able(px, py, 0, 1)
+    move_if_able(px, py, 0, 1, false, false)
   elseif btnp(5) and not is_won() then
     _init()
   end
@@ -104,11 +105,11 @@ function find_player()
   end
 end
 
-function move_if_able(x, y, dx, dy)
+function move_if_able(x, y, dx, dy, pusher_push, block_push)
   local target_x = x + dx
   local target_y = y + dy
 
-  if able_to_move(x, y, dx, dy) then
+  if able_to_move(x, y, dx, dy, pusher_push, block_push) then
     move_piece(x, y, target_x, target_y)
     return true
   else
@@ -116,7 +117,7 @@ function move_if_able(x, y, dx, dy)
   end
 end
 
-function able_to_move(x, y, dx, dy)
+function able_to_move(x, y, dx, dy, pusher_push, block_push)
   local target_x = x + dx
   local target_y = y + dy
 
@@ -130,12 +131,17 @@ function able_to_move(x, y, dx, dy)
   if piece == "E" then
     return false
   elseif piece == "Y" then
-    return dx == 0 and (target_piece == "." or move_if_able(target_x, target_y, dx, dy))
+    return (dx == 0 or pusher_push) and (target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true))
   elseif piece == "B" then
-    return dy == 0 and (target_piece == "." or move_if_able(target_x, target_y, dx, dy))
+    return (dy == 0 or pusher_push) and (target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true))
+  elseif piece == "G" then
+    return target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true)
+  elseif piece == "P" then
+    -- a push only becomes a "pusher push" if the pusher is pushed by a block
+    return target_piece == "." or move_if_able(target_x, target_y, dx, dy, block_push, block_push)
   elseif target_piece == "." then
     return true
-  elseif move_if_able(target_x, target_y, dx, dy) then
+  elseif move_if_able(target_x, target_y, dx, dy, pusher_push) then
     return true
   else
     return false
@@ -193,8 +199,55 @@ function draw_board()
 
       if piece_tile ~= "." then
         draw_square(sprites[piece_tile], x, y)
+
+        if piece_tile == "P" then
+          -- fill in pixels that match any adjacent G, Y, or B pieces
+          local center = { x = x * 11 + board_buffer + 5, y = y * 11 + board_buffer + 5 }
+
+          if x > 1 and (pieces[y][x - 1] == "G" or pieces[y][x - 1] == "B") then
+            local color = color_for_piece(pieces[y][x - 1])
+            line(center.x + 3, center.y, center.x + 4, center.y, color)
+            line(center.x + 4, center.y + 1, center.x + 4, center.y - 1, color)
+          end
+
+          if x < 9 and (pieces[y][x + 1] == "G" or pieces[y][x + 1] == "B") then
+            local color = color_for_piece(pieces[y][x + 1])
+            line(center.x - 3, center.y, center.x - 4, center.y, color)
+            line(center.x - 4, center.y + 1, center.x - 4, center.y - 1, color)
+          end
+
+          if y > 1 and (pieces[y - 1][x] == "G" or pieces[y - 1][x] == "Y") then
+            local color = color_for_piece(pieces[y - 1][x])
+            line(center.x, center.y + 3, center.x, center.y + 4, color)
+            line(center.x + 1, center.y + 4, center.x - 1, center.y + 4, color)
+          end
+
+          if y < 9 and (pieces[y + 1][x] == "G" or pieces[y + 1][x] == "Y") then
+            local color = color_for_piece(pieces[y + 1][x])
+            line(center.x, center.y - 3, center.x, center.y - 4, color)
+            line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
+          end
+        end
       end
     end
+  end
+end
+
+function piece_is_slider(piece)
+  return piece == "G" or piece == "Y" or piece == "B"
+end
+
+function color_for_piece(piece)
+  if piece == "W" then
+    return 7
+  elseif piece == "G" then
+    return 11
+  elseif piece == "Y" then
+    return 10
+  elseif piece == "B" then
+    return 12
+  elseif piece == "P" then
+    return 13
   end
 end
 
@@ -215,14 +268,14 @@ __gfx__
 00000000000000006dddd7dddd56dddbbbddd56ddddddddd50000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000006ddd777ddd56ddddbdddd56ddddddddd50000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000d5555555551d5555555551d55555555500000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000d666666666dd666666666d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddddadddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56dddaaaddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddddadddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddddadddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56dddaaaddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000006ddddddddd56ddddadddd5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000d5555555551d5555555550000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000d666666666dd666666666d0000000000000000000000d666666666d000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddddadddd500000000000000000000006ddd555ddd5000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56dddaaaddd500000000000000000000006dddd5dddd5000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddddadddd500000000000000000000006dddd5dddd5000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000065dd000dd55000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000065550005555000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddd000ddd5000077700000000aaa000065dd000dd55000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddddadddd500000000000000000000006dddd5dddd5000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56dddaaaddd500000000000000000000006dddd5dddd5000000000000000000000000000000000000000000000000000000000
+00000000000000006ddddddddd56ddddadddd500000000000000000000006ddd555ddd5000000000000000000000000000000000000000000000000000000000
+0000000000000000d5555555551d55555555500000000000000000000000d5555555550000000000000000000000000000000000000000000000000000000000
