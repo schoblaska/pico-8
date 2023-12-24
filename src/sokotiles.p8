@@ -1,28 +1,17 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+
 -- sokotiles
 -- by schoblaska
+
+#include sokotiles/sprites.lua
+#include sokotiles/draw.lua
+#include sokotiles/gamelogic.lua
 
 function _init()
   board_buffer = 3
   cleared_post_win = false
-  sprites = {
-    w = { 38, 12 },
-    y = { 49, 12 },
-    g = { 49, 1 },
-    b = { 60, 1 },
-    E = { 16, 12 },
-    W = { 16, 1 },
-    G = { 27, 1 },
-    Y = { 27, 12 },
-    B = { 38, 1 },
-    P = { 60, 12 },
-    WV = { 71, 1 },
-    BV = { 71, 12 },
-    GV = { 82, 1 },
-    YV = { 82, 12 }
-  }
 
   board = {
     { ".", ".", ".", ".", ".", ".", ".", ".", "." },
@@ -92,12 +81,6 @@ function _draw()
   draw_board()
 end
 
-function draw_star_field(intensity)
-  for i = 1, 300 * intensity do
-    pset(rnd(128), rnd(128), rnd(16))
-  end
-end
-
 function find_player()
   for y = 1, 9 do
     for x = 1, 9 do
@@ -106,180 +89,6 @@ function find_player()
       end
     end
   end
-end
-
-function move_if_able(x, y, dx, dy, pusher_push, block_push)
-  local target_x = x + dx
-  local target_y = y + dy
-
-  if able_to_move(x, y, dx, dy, pusher_push, block_push) then
-    move_piece(x, y, target_x, target_y)
-    return true
-  else
-    return false
-  end
-end
-
-function able_to_move(x, y, dx, dy, pusher_push, block_push)
-  local target_x = x + dx
-  local target_y = y + dy
-
-  if target_x < 1 or target_x > 9 or target_y < 1 or target_y > 9 then
-    return false
-  end
-
-  local piece = pieces[y][x]
-  local target_piece = pieces[target_y][target_x]
-
-  if piece == "E" then
-    return false
-  elseif piece == "Y" then
-    return (dx == 0 or pusher_push) and (target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true))
-  elseif piece == "B" then
-    return (dy == 0 or pusher_push) and (target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true))
-  elseif piece == "G" then
-    return target_piece == "." or move_if_able(target_x, target_y, dx, dy, pusher_push, true)
-  elseif piece == "P" then
-    -- a push only becomes a "pusher push" if the pusher is pushed by a block
-    return target_piece == "." or move_if_able(target_x, target_y, dx, dy, block_push, block_push)
-  elseif target_piece == "." then
-    return true
-  elseif move_if_able(target_x, target_y, dx, dy, pusher_push) then
-    return true
-  else
-    return false
-  end
-end
-
-function move_piece(x, y, target_x, target_y)
-  local piece = pieces[y][x]
-
-  pieces[y][x] = "."
-  pieces[target_y][target_x] = piece
-end
-
-function is_won()
-  for y = 1, 9 do
-    for x = 1, 9 do
-      local board_tile = board[y][x]
-      local piece_tile = pieces[y][x]
-
-      if board_tile == "w" and piece_tile ~= "W" then
-        return false
-      elseif board_tile == "g" and piece_tile ~= "G" then
-        return false
-      elseif board_tile == "y" and piece_tile ~= "Y" then
-        return false
-      elseif board_tile == "b" and piece_tile ~= "B" then
-        return false
-      end
-    end
-  end
-
-  return true
-end
-
-function draw_twinkles()
-  local times = is_won() and 10 or 1
-
-  for i = 1, times do
-    local is_black = rnd(20) < 19
-    local color = is_black and 0 or rnd(15) + 1
-
-    pset(rnd(128), rnd(128), color)
-  end
-end
-
-function draw_board()
-  for x = 1, 9 do
-    for y = 1, 9 do
-      local board_tile = board[y][x]
-      local piece_tile = pieces[y][x]
-
-      if board_tile ~= "." then
-        draw_square(sprites[board_tile], x, y)
-      end
-
-      if piece_tile == "P" then
-        draw_square(sprites[piece_tile], x, y)
-
-        -- fill in pixels that match any adjacent G, Y, or B pieces
-        local center = { x = x * 11 + board_buffer + 5, y = y * 11 + board_buffer + 5 }
-
-        if x > 1 and (pieces[y][x - 1] == "G" or pieces[y][x - 1] == "B") then
-          local color = color_for_piece(pieces[y][x - 1])
-          line(center.x + 3, center.y, center.x + 4, center.y, color)
-          line(center.x + 4, center.y + 1, center.x + 4, center.y - 1, color)
-        end
-
-        if x < 9 and (pieces[y][x + 1] == "G" or pieces[y][x + 1] == "B") then
-          local color = color_for_piece(pieces[y][x + 1])
-          line(center.x - 3, center.y, center.x - 4, center.y, color)
-          line(center.x - 4, center.y + 1, center.x - 4, center.y - 1, color)
-        end
-
-        if y > 1 and (pieces[y - 1][x] == "G" or pieces[y - 1][x] == "Y") then
-          local color = color_for_piece(pieces[y - 1][x])
-          line(center.x, center.y + 3, center.x, center.y + 4, color)
-          line(center.x + 1, center.y + 4, center.x - 1, center.y + 4, color)
-        end
-
-        if y < 9 and (pieces[y + 1][x] == "G" or pieces[y + 1][x] == "Y") then
-          local color = color_for_piece(pieces[y + 1][x])
-          line(center.x, center.y - 3, center.x, center.y - 4, color)
-          line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
-        end
-      elseif piece_tile == "W" then
-        if board_tile == "w" then
-          draw_square(sprites["WV"], x, y)
-        else
-          draw_square(sprites["W"], x, y)
-        end
-      elseif piece_tile == "Y" then
-        if board_tile == "y" then
-          draw_square(sprites["YV"], x, y)
-        else
-          draw_square(sprites["Y"], x, y)
-        end
-      elseif piece_tile == "G" then
-        if board_tile == "g" then
-          draw_square(sprites["GV"], x, y)
-        else
-          draw_square(sprites["G"], x, y)
-        end
-      elseif piece_tile == "B" then
-        if board_tile == "b" then
-          draw_square(sprites["BV"], x, y)
-        else
-          draw_square(sprites["B"], x, y)
-        end
-      elseif piece_tile ~= "." then
-        draw_square(sprites[piece_tile], x, y)
-      end
-    end
-  end
-end
-
-function piece_is_slider(piece)
-  return piece == "G" or piece == "Y" or piece == "B"
-end
-
-function color_for_piece(piece)
-  if piece == "W" then
-    return 7
-  elseif piece == "G" then
-    return 11
-  elseif piece == "Y" then
-    return 10
-  elseif piece == "B" then
-    return 12
-  elseif piece == "P" then
-    return 13
-  end
-end
-
-function draw_square(sprite, x, y)
-  sspr(sprite[1], sprite[2], 11, 11, x * 11 + board_buffer, y * 11 + board_buffer)
 end
 
 __gfx__
