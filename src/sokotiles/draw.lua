@@ -129,10 +129,10 @@ function draw_game()
 end
 
 function draw_title()
-  local menu_xy = { x = 14, y = 56 }
+  local menu_xy = { x = 14, y = 64 }
 
   draw_stars(100, 1)
-  draw_text("sokotiles", 14, 32, 7, 0)
+  sspr(0, 109, 128, 18, 0, 32)
   draw_text("play", menu_xy.x, menu_xy.y, 7, 0)
   draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 5, 0)
   draw_text(">", menu_xy.x - 5, menu_xy.y + title_menu_selection * 8, 7, 0)
