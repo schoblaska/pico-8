@@ -116,7 +116,7 @@ end
 
 function draw_game()
   if is_won() then
-    draw_stars(200, 2)
+    draw_stars(300, 5)
   else
     draw_stars(100, 1)
     rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 110, board_buffer + 110, 0)
@@ -134,8 +134,8 @@ function draw_title()
   draw_stars(100, 1)
   draw_text("sokotiles", 14, 32, 7, 0)
   draw_text("play", menu_xy.x, menu_xy.y, 7, 0)
-  draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 7, 0)
-  draw_text(">", menu_xy.x - 5, menu_xy.y + (title_menu_selection - 1) * 8, 7, 0)
+  draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 5, 0)
+  draw_text(">", menu_xy.x - 5, menu_xy.y + title_menu_selection * 8, 7, 0)
 end
 
 function draw_text(text, x, y, fg, bg)

@@ -43,7 +43,7 @@ function _update()
       title_menu_selection -= 1
     elseif btnp(3) and title_menu_selection < 1 then
       title_menu_selection += 1
-    elseif btnp(6) and title_menu_selection == 0 then
+    elseif btnp(4) and title_menu_selection == 0 then
       set_scene("game")
     end
   elseif scene == "game" then
