@@ -1,15 +1,5 @@
 board_buffer = 3
-
-function draw_twinkles()
-  local times = is_won() and 10 or 1
-
-  for i = 1, times do
-    local is_black = rnd(20) < 19
-    local color = is_black and 0 or rnd(15) + 1
-
-    pset(rnd(128), rnd(128), color)
-  end
-end
+stars = {}
 
 function draw_board()
   for x = 1, 9 do
@@ -99,42 +89,49 @@ function draw_square(sprite, x, y)
   sspr(sprite[1], sprite[2], 11, 11, x * 11 + board_buffer, y * 11 + board_buffer)
 end
 
-function draw_star_field(intensity)
-  for i = 1, 300 * intensity do
-    pset(rnd(128), rnd(128), rnd(16))
+function draw_stars(count, twinkle)
+  while #stars < count do
+    add(
+      stars, {
+        x = flr(rnd(128)),
+        y = flr(rnd(128)),
+        color = flr(rnd(15)) + 1
+      }
+    )
+  end
+
+  while #stars > count do
+    del(stars, stars[1])
+  end
+
+  if rnd(30) < twinkle then
+    i = flr(rnd(#stars)) + 1
+    del(stars, stars[i])
+  end
+
+  for star in all(stars) do
+    pset(star.x, star.y, star.color)
   end
 end
 
 function draw_game()
-  if is_won() and not cleared_post_win then
-    cls()
-    cleared_post_win = true
-    rectfill(0, 0, 127, 127, 0)
-    draw_star_field(2)
-  elseif not is_won() and cleared_post_win then
-    cls()
-    draw_star_field(1)
-    cleared_post_win = false
-  end
-
-  draw_twinkles()
-
-  draw_text("sokotiles", 14, 8, 7, 0)
-
-  if not is_won() then
+  if is_won() then
+    draw_stars(200, 2)
+  else
+    draw_stars(100, 1)
     rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 110, board_buffer + 110, 0)
     draw_text("arrows: move", 14, 114, 13, 0)
     draw_text("x: reset", 82, 114, 13, 0)
   end
 
+  draw_text("sokotiles", 14, 8, 7, 0)
   draw_board()
 end
 
 function draw_title()
   local menu_xy = { x = 14, y = 56 }
 
-  draw_twinkles()
-
+  draw_stars(100, 1)
   draw_text("sokotiles", 14, 32, 7, 0)
   draw_text("play", menu_xy.x, menu_xy.y, 7, 0)
   draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 7, 0)

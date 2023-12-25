@@ -39,11 +39,11 @@ end
 
 function _update()
   if scene == "title" then
-    if btnp(2) and title_menu_selection > 1 then
+    if btnp(2) and title_menu_selection > 0 then
       title_menu_selection -= 1
-    elseif btnp(3) and title_menu_selection < 2 then
+    elseif btnp(3) and title_menu_selection < 1 then
       title_menu_selection += 1
-    elseif btnp(6) and title_menu_selection == 1 then
+    elseif btnp(6) and title_menu_selection == 0 then
       set_scene("game")
     end
   elseif scene == "game" then
@@ -64,6 +64,8 @@ function _update()
 end
 
 function _draw()
+  cls()
+
   if scene == "title" then
     draw_title()
   elseif scene == "game" then
@@ -71,15 +73,10 @@ function _draw()
   end
 end
 
+-- TODO: not necessary?
 function set_scene(new_scene)
   if new_scene == "title" then
-    cls()
-    draw_star_field(2)
-    title_menu_selection = 1
-  elseif new_scene == "game" then
-    cls()
-    draw_star_field(1)
-    cleared_post_win = false
+    title_menu_selection = 0
   end
 
   scene = new_scene
