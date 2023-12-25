@@ -10,9 +10,6 @@ __lua__
 #include sokotiles/gamelogic.lua
 
 function _init()
-  board_buffer = 3
-  cleared_post_win = false
-
   board = {
     { ".", ".", ".", ".", ".", ".", ".", ".", "." },
     { ".", ".", ".", ".", ".", ".", ".", "y", "." },
@@ -37,50 +34,58 @@ function _init()
     { ".", ".", ".", ".", ".", ".", ".", ".", "E" }
   }
 
-  cls()
-  rectfill(0, 0, 127, 127, 0)
-  draw_star_field(1)
+  set_scene("title")
 end
 
 function _update()
-  px, py = find_player()
+  if scene == "title" then
+    if btnp(2) and title_menu_selection > 1 then
+      title_menu_selection -= 1
+    elseif btnp(3) and title_menu_selection < 2 then
+      title_menu_selection += 1
+    elseif btnp(6) and title_menu_selection == 1 then
+      set_scene("game")
+    end
+  elseif scene == "game" then
+    px, py = find_player()
 
-  if btnp(0) then
-    move_if_able(px, py, -1, 0, false, false)
-  elseif btnp(1) then
-    move_if_able(px, py, 1, 0, false, false)
-  elseif btnp(2) then
-    move_if_able(px, py, 0, -1, false, false)
-  elseif btnp(3) then
-    move_if_able(px, py, 0, 1, false, false)
-  elseif btnp(5) and not is_won() then
-    _init()
+    if btnp(0) then
+      move_if_able(px, py, -1, 0, false, false)
+    elseif btnp(1) then
+      move_if_able(px, py, 1, 0, false, false)
+    elseif btnp(2) then
+      move_if_able(px, py, 0, -1, false, false)
+    elseif btnp(3) then
+      move_if_able(px, py, 0, 1, false, false)
+    elseif btnp(5) and not is_won() then
+      _init()
+    end
   end
 end
 
 function _draw()
-  if is_won() and not cleared_post_win then
+  if scene == "title" then
+    draw_title()
+  elseif scene == "game" then
+    draw_game()
+  end
+end
+
+function set_scene(new_scene)
+  if new_scene == "title" then
     cls()
-    cleared_post_win = true
-    rectfill(0, 0, 127, 127, 0)
     draw_star_field(2)
-  elseif not is_won() and cleared_post_win then
+    title_menu_selection = 1
+  elseif new_scene == "game" then
     cls()
     draw_star_field(1)
     cleared_post_win = false
   end
 
-  draw_twinkles()
-  print("sokotiles", 14, 8, 7)
-
-  if not is_won() then
-    rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 110, board_buffer + 110, 0)
-    print("arrows: move", 14, 114, 13)
-    print("x: reset", 82, 114, 13)
-  end
-  draw_board()
+  scene = new_scene
 end
 
+-- TODO: store this in a variable when loading level
 function find_player()
   for y = 1, 9 do
     for x = 1, 9 do

@@ -1,3 +1,5 @@
+board_buffer = 3
+
 function draw_twinkles()
   local times = is_won() and 10 or 1
 
@@ -101,4 +103,48 @@ function draw_star_field(intensity)
   for i = 1, 300 * intensity do
     pset(rnd(128), rnd(128), rnd(16))
   end
+end
+
+function draw_game()
+  if is_won() and not cleared_post_win then
+    cls()
+    cleared_post_win = true
+    rectfill(0, 0, 127, 127, 0)
+    draw_star_field(2)
+  elseif not is_won() and cleared_post_win then
+    cls()
+    draw_star_field(1)
+    cleared_post_win = false
+  end
+
+  draw_twinkles()
+
+  draw_text("sokotiles", 14, 8, 7, 0)
+
+  if not is_won() then
+    rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 110, board_buffer + 110, 0)
+    draw_text("arrows: move", 14, 114, 13, 0)
+    draw_text("x: reset", 82, 114, 13, 0)
+  end
+
+  draw_board()
+end
+
+function draw_title()
+  local menu_xy = { x = 14, y = 56 }
+
+  draw_twinkles()
+
+  draw_text("sokotiles", 14, 32, 7, 0)
+  draw_text("play", menu_xy.x, menu_xy.y, 7, 0)
+  draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 7, 0)
+  draw_text(">", menu_xy.x - 5, menu_xy.y + (title_menu_selection - 1) * 8, 7, 0)
+end
+
+function draw_text(text, x, y, fg, bg)
+  if bg then
+    rectfill(x, y, x + #text * 4 - 2, y + 4, bg)
+  end
+
+  print(text, x, y, fg)
 end
