@@ -17,7 +17,7 @@ Messing around with the [PICO-8](http://pico-8.com).
         <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/sokotiles_wip2.p8.png" align="right">
       </a>
       <h3>Sokotiles (wip2)</h3>
-      <p>A sliding tile game inspired by <a href="https://www.sokobanonline.com/">Sokoban</a> and <a href="https://www.dosgamesarchive.com/download/cyberbox">Cyberbox</a></p>
+      <p>A sliding tile game inspired by <a href="https://www.sokobanonline.com/">Sokoban</a> and <a href="https://www.dosgamesarchive.com/download/cyberbox">Cyberbox</a></p>.
     </td>
   </tr>
   <tr>
