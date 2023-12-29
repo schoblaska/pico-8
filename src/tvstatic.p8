@@ -104,8 +104,15 @@ function draw_tvstatic()
         pset(x - 1, y - 1, jittermap[oldc + 1])
       elseif tvstatic_map[x][y] == 2 and rnd() < 0.2 then
         pset(x - 1, y - 1, jittermap[oldc + 1])
-      elseif tvstatic_map[x][y] == 3 and rnd() < 0.5 then
-        pset(x - 1, y - 1, jittermap[oldc + 1])
+      elseif tvstatic_map[x][y] == 3 then
+        local rand = rnd()
+        if rand < 0.15 then
+          pset(x - 1, y - 1, 7)
+        elseif rnd() < 0.30 then
+          pset(x - 1, y - 1, 0)
+        elseif rnd() < 0.65 then
+          pset(x - 1, y - 1, jittermap[oldc + 1])
+        end
       end
     end
   end
