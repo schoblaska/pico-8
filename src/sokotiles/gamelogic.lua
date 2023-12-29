@@ -46,6 +46,7 @@ function move_piece(x, y, target_x, target_y)
 
   pieces[y][x] = "."
   pieces[target_y][target_x] = piece
+  add_animation(x, y, target_x, target_y)
 end
 
 function piece_is_slider(piece)

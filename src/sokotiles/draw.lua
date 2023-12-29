@@ -1,5 +1,6 @@
 board_buffer = 3
 stars = {}
+animations = {}
 
 function draw_board()
   for x = 1, 9 do
@@ -11,63 +12,79 @@ function draw_board()
         draw_square(sprites[board_tile], x, y)
       end
 
-      if piece_tile == "P" then
-        draw_square(sprites[piece_tile], x, y)
-
-        -- fill in pixels that match any adjacent G, Y, or B pieces
-        local center = { x = x * 11 + board_buffer + 5, y = y * 11 + board_buffer + 5 }
-
-        if x > 1 and (pieces[y][x - 1] == "G" or pieces[y][x - 1] == "B") then
-          local color = color_for_piece(pieces[y][x - 1])
-          line(center.x + 3, center.y, center.x + 4, center.y, color)
-          line(center.x + 4, center.y + 1, center.x + 4, center.y - 1, color)
-        end
-
-        if x < 9 and (pieces[y][x + 1] == "G" or pieces[y][x + 1] == "B") then
-          local color = color_for_piece(pieces[y][x + 1])
-          line(center.x - 3, center.y, center.x - 4, center.y, color)
-          line(center.x - 4, center.y + 1, center.x - 4, center.y - 1, color)
-        end
-
-        if y > 1 and (pieces[y - 1][x] == "G" or pieces[y - 1][x] == "Y") then
-          local color = color_for_piece(pieces[y - 1][x])
-          line(center.x, center.y + 3, center.x, center.y + 4, color)
-          line(center.x + 1, center.y + 4, center.x - 1, center.y + 4, color)
-        end
-
-        if y < 9 and (pieces[y + 1][x] == "G" or pieces[y + 1][x] == "Y") then
-          local color = color_for_piece(pieces[y + 1][x])
-          line(center.x, center.y - 3, center.x, center.y - 4, color)
-          line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
-        end
-      elseif piece_tile == "W" then
-        if board_tile == "w" then
-          draw_square(sprites["WV"], x, y)
-        else
-          draw_square(sprites["W"], x, y)
-        end
-      elseif piece_tile == "Y" then
-        if board_tile == "y" then
-          draw_square(sprites["YV"], x, y)
-        else
-          draw_square(sprites["Y"], x, y)
-        end
-      elseif piece_tile == "G" then
-        if board_tile == "g" then
-          draw_square(sprites["GV"], x, y)
-        else
-          draw_square(sprites["G"], x, y)
-        end
-      elseif piece_tile == "B" then
-        if board_tile == "b" then
-          draw_square(sprites["BV"], x, y)
-        else
-          draw_square(sprites["B"], x, y)
-        end
-      elseif piece_tile ~= "." then
-        draw_square(sprites[piece_tile], x, y)
-      end
+      draw_piece(piece_tile, x, y)
     end
+  end
+end
+
+function draw_piece(piece_tile, x, y)
+  for animation in all(animations) do
+    if animation.to_x == x and animation.to_y == y then
+      local delta_x = animation.to_x - animation.from_x
+      local delta_y = animation.to_y - animation.from_y
+      local magnitudes = { 0, 0.1, 0.2, 0.8 }
+      local magnitude = magnitudes[animation.frame + 1]
+
+      x = animation.from_x + delta_x * magnitude
+      y = animation.from_y + delta_y * magnitude
+    end
+  end
+
+  if piece_tile == "P" then
+    draw_square(sprites[piece_tile], x, y)
+
+    -- fill in pixels that match any adjacent G, Y, or B pieces
+    local center = { x = x * 11 + board_buffer + 5, y = y * 11 + board_buffer + 5 }
+
+    if x > 1 and (pieces[y][x - 1] == "G" or pieces[y][x - 1] == "B") then
+      local color = color_for_piece(pieces[y][x - 1])
+      line(center.x + 3, center.y, center.x + 4, center.y, color)
+      line(center.x + 4, center.y + 1, center.x + 4, center.y - 1, color)
+    end
+
+    if x < 9 and (pieces[y][x + 1] == "G" or pieces[y][x + 1] == "B") then
+      local color = color_for_piece(pieces[y][x + 1])
+      line(center.x - 3, center.y, center.x - 4, center.y, color)
+      line(center.x - 4, center.y + 1, center.x - 4, center.y - 1, color)
+    end
+
+    if y > 1 and (pieces[y - 1][x] == "G" or pieces[y - 1][x] == "Y") then
+      local color = color_for_piece(pieces[y - 1][x])
+      line(center.x, center.y + 3, center.x, center.y + 4, color)
+      line(center.x + 1, center.y + 4, center.x - 1, center.y + 4, color)
+    end
+
+    if y < 9 and (pieces[y + 1][x] == "G" or pieces[y + 1][x] == "Y") then
+      local color = color_for_piece(pieces[y + 1][x])
+      line(center.x, center.y - 3, center.x, center.y - 4, color)
+      line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
+    end
+  elseif piece_tile == "W" then
+    if board_tile == "w" then
+      draw_square(sprites["WV"], x, y)
+    else
+      draw_square(sprites["W"], x, y)
+    end
+  elseif piece_tile == "Y" then
+    if board_tile == "y" then
+      draw_square(sprites["YV"], x, y)
+    else
+      draw_square(sprites["Y"], x, y)
+    end
+  elseif piece_tile == "G" then
+    if board_tile == "g" then
+      draw_square(sprites["GV"], x, y)
+    else
+      draw_square(sprites["G"], x, y)
+    end
+  elseif piece_tile == "B" then
+    if board_tile == "b" then
+      draw_square(sprites["BV"], x, y)
+    else
+      draw_square(sprites["B"], x, y)
+    end
+  elseif piece_tile ~= "." then
+    draw_square(sprites[piece_tile], x, y)
   end
 end
 
@@ -144,4 +161,27 @@ function draw_text(text, x, y, fg, bg)
   end
 
   print(text, x, y, fg)
+end
+
+function add_animation(from_x, from_y, to_x, to_y)
+  add(
+    animations,
+    {
+      from_x = from_x,
+      from_y = from_y,
+      to_x = to_x,
+      to_y = to_y,
+      frame = 0
+    }
+  )
+end
+
+function advance_animations()
+  for animation in all(animations) do
+    animation.frame += 1
+
+    if animation.frame > 3 then
+      del(animations, animation)
+    end
+  end
 end

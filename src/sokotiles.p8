@@ -50,18 +50,22 @@ function _update()
       set_scene("game")
     end
   elseif scene == "game" then
-    px, py = find_player()
+    if #animations > 0 then
+      advance_animations()
+    else
+      px, py = find_player()
 
-    if btnp(0) then
-      move_if_able(px, py, -1, 0, false, false)
-    elseif btnp(1) then
-      move_if_able(px, py, 1, 0, false, false)
-    elseif btnp(2) then
-      move_if_able(px, py, 0, -1, false, false)
-    elseif btnp(3) then
-      move_if_able(px, py, 0, 1, false, false)
-    elseif btnp(5) and not is_won() then
-      load_level()
+      if btn(0) then
+        move_if_able(px, py, -1, 0, false, false)
+      elseif btn(1) then
+        move_if_able(px, py, 1, 0, false, false)
+      elseif btn(2) then
+        move_if_able(px, py, 0, -1, false, false)
+      elseif btn(3) then
+        move_if_able(px, py, 0, 1, false, false)
+      elseif btnp(5) and not is_won() then
+        load_level()
+      end
     end
   end
 end
