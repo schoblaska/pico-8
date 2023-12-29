@@ -4,6 +4,24 @@ Messing around with the [PICO-8](http://pico-8.com).
 <table>
   <tr>
     <td valign="top">
+      <a href="https://schoblaska.github.io/pico-8/tvstatic.html">
+        <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/tvstatic.p8.png" align="right">
+      </a>
+      <h3>TV Static</h3>
+      <p>Experimenting with a TV static effect.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <a href="https://schoblaska.github.io/pico-8/sokotiles_wip2.html">
+        <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/sokotiles_wip2.p8.png" align="right">
+      </a>
+      <h3>Sokotiles (wip2)</h3>
+      <p>A sliding tile game inspired by <a href="https://www.sokobanonline.com/">Sokoban</a> and <a href="https://www.dosgamesarchive.com/download/cyberbox">Cyberbox</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
       <a href="https://schoblaska.github.io/pico-8/hund3d.html">
         <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/hund3d.p8.png" align="right">
       </a>
