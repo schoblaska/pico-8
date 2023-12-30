@@ -95,7 +95,6 @@ function draw_tvstatic()
       local newx = x - flr(tvstatic_distortion[distortiony] / 2)
 
       if newx < 1 then
-        printh(newx, "tvstatic.log")
         pset(x - 1, y - 1, orig_screen[newx + 128][y + 1])
       elseif newx > 128 then
         pset(x - 1, y - 1, orig_screen[newx - 128][y + 1])
