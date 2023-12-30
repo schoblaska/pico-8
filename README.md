@@ -3,7 +3,7 @@ Messing around with the [PICO-8](http://pico-8.com).
 ## Games
 <table>
   <tr>
-    <td valign="top">
+    <td valign="top" width="999">
       <a href="https://schoblaska.github.io/pico-8/tvstatic.html">
         <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/tvstatic.p8.png" align="right">
       </a>
