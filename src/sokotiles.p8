@@ -353,12 +353,13 @@ function draw_game()
     draw_stars(300, 5)
   else
     draw_stars(100, 1)
-    rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 110, board_buffer + 110, 0)
-    draw_text("arrows: move", 14, 114, 13, 0)
-    draw_text("x: reset", 82, 114, 13, 0)
+    rectfill(board_buffer + 9, board_buffer + 9, board_buffer + 111, board_buffer + 111, 1)
+    rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 109, board_buffer + 109, 0)
+    draw_text("arrows: move", 12, 116, 13, 0)
+    draw_text("x: reset", 84, 116, 13, 0)
   end
 
-  draw_text("sokotiles", 14, 8, 7, 0)
+  draw_text("sokotiles", 12, 6, 7, 0)
   draw_board()
   draw_tiles()
 end
