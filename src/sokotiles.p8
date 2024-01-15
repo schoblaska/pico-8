@@ -33,36 +33,9 @@ function _init()
     [14] = "g",
     [30] = "y"
   }
+  reset_cache()
   load_level()
   set_scene("title")
-end
-
-function load_level()
-  board = {}
-  tiles = {}
-
-  for x = 1, 9 do
-    board[x] = {}
-    for y = 1, 9 do
-      map_sprite = mget(x - 1, y - 1)
-      if board_map_sprites[map_sprite] then
-        board[x][y] = board_map_sprites[map_sprite]
-      else
-        board[x][y] = "."
-        if tile_map_sprites[map_sprite] then
-          add(
-            tiles, {
-              value = tile_map_sprites[map_sprite],
-              x = x,
-              y = y,
-              x_offset = 0,
-              y_offset = 0
-            }
-          )
-        end
-      end
-    end
-  end
 end
 
 function _update60()
@@ -103,7 +76,53 @@ function _draw()
   elseif scene == "game" then
     draw_game()
   end
-  -- print("cpu: " .. stat(1) .. "%", 1, 122, 12)
+  print("cpu: " .. stat(1) .. "%", 1, 122, 12)
+end
+
+function reset_cache()
+  cache = {}
+  cache_keys = {}
+end
+
+function write_cache(key, value)
+  cache[key] = value
+  cache_keys[key] = true
+end
+
+function read_cache(key)
+  return cache[key]
+end
+
+function in_cache(key)
+  return cache_keys[key]
+end
+
+function load_level()
+  board = {}
+  tiles = {}
+
+  for x = 1, 9 do
+    board[x] = {}
+    for y = 1, 9 do
+      map_sprite = mget(x - 1, y - 1)
+      if board_map_sprites[map_sprite] then
+        board[x][y] = board_map_sprites[map_sprite]
+      else
+        board[x][y] = "."
+        if tile_map_sprites[map_sprite] then
+          add(
+            tiles, {
+              value = tile_map_sprites[map_sprite],
+              x = x,
+              y = y,
+              x_offset = 0,
+              y_offset = 0
+            }
+          )
+        end
+      end
+    end
+  end
 end
 
 -- TODO: not necessary?
@@ -124,8 +143,15 @@ function find_player()
 end
 
 function tile_at(x, y)
+  cache_key = "tile_at_" .. x .. "_" .. y
+
+  if in_cache(cache_key) then
+    return read_cache(cache_key)
+  end
+
   for tile in all(tiles) do
     if tile.x == x and tile.y == y then
+      write_cache(cache_key, tile)
       return tile
     end
   end
@@ -195,40 +221,57 @@ function move_tile(x, y, target_x, target_y)
   tile.y = target_y
   tile.x_offset = (x - target_x) * 11
   tile.y_offset = (y - target_y) * 11
+
+  reset_cache()
 end
 
 function is_won()
+  if in_cache("is_won") then
+    return read_cache("is_won")
+  end
+
   if animating() then
     return false
   end
 
-  for x = 1, 9 do
-    for y = 1, 9 do
-      local board_square = board[x][y]
-      local tile_value = tile_value_at(x, y)
+  local check_is_won = function()
+    for x = 1, 9 do
+      for y = 1, 9 do
+        local board_square = board[x][y]
+        local tile_value = tile_value_at(x, y)
 
-      if board_square == "w" and tile_value ~= "W" then
-        return false
-      elseif board_square == "g" and tile_value ~= "G" then
-        return false
-      elseif board_square == "y" and tile_value ~= "Y" then
-        return false
-      elseif board_square == "b" and tile_value ~= "B" then
-        return false
+        if board_square == "w" and tile_value ~= "W" then
+          return false
+        elseif board_square == "g" and tile_value ~= "G" then
+          return false
+        elseif board_square == "y" and tile_value ~= "Y" then
+          return false
+        elseif board_square == "b" and tile_value ~= "B" then
+          return false
+        end
       end
     end
+
+    return true
   end
 
-  return true
+  local val = check_is_won()
+  write_cache("is_won", val)
+  return val
 end
 
 function animating()
+  if in_cache("animating") then
+    return read_cache("animating")
+  end
+
   for tile in all(tiles) do
     if tile.x_offset ~= 0 or tile.y_offset ~= 0 then
       return true
     end
   end
 
+  write_cache("animating", false)
   return false
 end
 
