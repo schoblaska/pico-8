@@ -367,11 +367,10 @@ function draw_game()
     draw_stars(100, 1)
     rectfill(11, 11, 115, 115, 0)
     draw_dotted_line(12, 18, 12, 114, 13)
-    draw_dotted_line(114, 12, 114, 114, 13)
+    draw_dotted_line(114, 12, 114, 110, 13)
     draw_dotted_line(18, 12, 114, 12, 13)
-    draw_dotted_line(12, 114, 114, 114, 13)
-    draw_text("arrows: move", 14, 114, 13, 0)
-    draw_text("x: reset", 82, 114, 13, 0)
+    draw_dotted_line(12, 114, 110, 114, 13)
+    draw_text("arrows: move  x: reset", 27, 114, 13, 0)
   end
 
   draw_text("sokotiles", 14, 8, 7, 0)
@@ -391,7 +390,7 @@ end
 
 function draw_text(text, x, y, fg, bg)
   if bg then
-    rectfill(x, y, x + #text * 4 - 2, y + 4, bg)
+    rectfill(x - 1, y - 1, x + #text * 4 - 1, y + 5, bg)
   end
 
   print(text, x, y, fg)
