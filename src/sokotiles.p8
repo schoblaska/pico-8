@@ -72,7 +72,7 @@ function load_level()
   end
 end
 
-function _update()
+function _update60()
   if scene == "title" then
     if btnp(2) and title_menu_selection > 0 then
       title_menu_selection -= 1
