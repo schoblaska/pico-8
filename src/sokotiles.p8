@@ -105,6 +105,7 @@ function _draw()
   elseif scene == "game" then
     draw_game()
   end
+  -- print("cpu: " .. stat(1) .. "%", 1, 122, 12)
 end
 
 -- TODO: not necessary?
@@ -252,7 +253,11 @@ function draw_board()
     for y = 1, 9 do
       local board_square = board[y][x]
 
-      if board_square ~= "." then
+      if board_square == "." then
+        if not is_won() then
+          pset(x * 11 + 8, y * 11 + 8, 1)
+        end
+      else
         draw_square(sprites[board_square], x, y)
       end
     end
@@ -307,7 +312,7 @@ function draw_tile(tile)
       line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
     end
   else
-    if board_square == "." then
+    if board_square == "." and is_won() then
       palt(0, false)
     end
     draw_square(sprites[value], x, y, xoff, yoff)
@@ -366,10 +371,10 @@ function draw_game()
   else
     draw_stars(100, 1)
     rectfill(11, 11, 115, 115, 0)
-    draw_dotted_line(12, 18, 12, 114, 13)
-    draw_dotted_line(114, 12, 114, 110, 13)
-    draw_dotted_line(18, 12, 114, 12, 13)
-    draw_dotted_line(12, 114, 110, 114, 13)
+    -- draw_dotted_line(12, 18, 12, 114, 13)
+    -- draw_dotted_line(114, 12, 114, 110, 13)
+    -- draw_dotted_line(18, 12, 114, 12, 13)
+    -- draw_dotted_line(12, 114, 110, 114, 13)
     draw_text("arrows: move  x: reset", 27, 114, 13, 0)
   end
 
