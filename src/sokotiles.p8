@@ -25,7 +25,6 @@ function _init()
   }
   load_level()
   set_scene("title")
-  animation_speed = 5
 end
 
 function load_level()
