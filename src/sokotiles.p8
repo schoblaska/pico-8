@@ -199,6 +199,10 @@ function move_tile(x, y, target_x, target_y)
 end
 
 function is_won()
+  if animating() then
+    return false
+  end
+
   for y = 1, 9 do
     for x = 1, 9 do
       local board_square = board[y][x]
