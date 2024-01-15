@@ -25,6 +25,7 @@ function _init()
   }
   load_level()
   set_scene("title")
+  animation_speed = 5
 end
 
 function load_level()
@@ -81,18 +82,22 @@ function _update60()
       set_scene("game")
     end
   elseif scene == "game" then
-    local player = find_player()
+    if animating() then
+      update_animations()
+    else
+      local player = find_player()
 
-    if btnp(0) then
-      move_if_able(player.x, player.y, -1, 0, false, false)
-    elseif btnp(1) then
-      move_if_able(player.x, player.y, 1, 0, false, false)
-    elseif btnp(2) then
-      move_if_able(player.x, player.y, 0, -1, false, false)
-    elseif btnp(3) then
-      move_if_able(player.x, player.y, 0, 1, false, false)
-    elseif btnp(5) and not is_won() then
-      load_level()
+      if btnp(0) then
+        move_if_able(player.x, player.y, -1, 0, false, false)
+      elseif btnp(1) then
+        move_if_able(player.x, player.y, 1, 0, false, false)
+      elseif btnp(2) then
+        move_if_able(player.x, player.y, 0, -1, false, false)
+      elseif btnp(3) then
+        move_if_able(player.x, player.y, 0, 1, false, false)
+      elseif btnp(5) and not is_won() then
+        load_level()
+      end
     end
   end
 end
@@ -191,8 +196,11 @@ end
 
 function move_tile(x, y, target_x, target_y)
   local tile = tile_at(x, y)
+
   tile.x = target_x
   tile.y = target_y
+  tile.x_offset = (x - target_x) * 11
+  tile.y_offset = (y - target_y) * 11
 end
 
 function is_won()
@@ -216,6 +224,30 @@ function is_won()
   return true
 end
 
+function animating()
+  for tile in all(tiles) do
+    if tile.x_offset ~= 0 or tile.y_offset ~= 0 then
+      return true
+    end
+  end
+
+  return false
+end
+
+function update_animations()
+  for tile in all(tiles) do
+    if tile.x_offset ~= 0 and sgn(tile.x_offset) == 1 then
+      tile.x_offset = max(tile.x_offset - sgn(tile.x_offset) * 2, 0)
+    elseif tile.x_offset ~= 0 and sgn(tile.x_offset) == -1 then
+      tile.x_offset = min(tile.x_offset - sgn(tile.x_offset) * 2, 0)
+    elseif tile.y_offset ~= 0 and sgn(tile.y_offset) == 1 then
+      tile.y_offset = max(tile.y_offset - sgn(tile.y_offset) * 2, 0)
+    elseif tile.y_offset ~= 0 and sgn(tile.y_offset) == -1 then
+      tile.y_offset = min(tile.y_offset - sgn(tile.y_offset) * 2, 0)
+    end
+  end
+end
+
 function draw_board()
   for x = 1, 9 do
     for y = 1, 9 do
@@ -235,14 +267,14 @@ function draw_tiles()
 end
 
 function draw_tile(tile)
-  local value, x, y = tile.value, tile.x, tile.y
+  local value, x, y, xoff, yoff = tile.value, tile.x, tile.y, tile.x_offset, tile.y_offset
   local board_square = board[y][x]
 
   if value == "P" then
     if board_square == "." then
       palt(0, false)
     end
-    draw_square(sprites[value], x, y)
+    draw_square(sprites[value], x, y, xoff, yoff)
     pal()
 
     -- fill in pixels that match any adjacent G, Y, or B pieces
@@ -275,32 +307,12 @@ function draw_tile(tile)
       line(center.x, center.y - 3, center.x, center.y - 4, color)
       line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
     end
-  elseif value == "W" then
+  else
     if board_square == "." then
       palt(0, false)
     end
-    draw_square(sprites["W"], x, y)
+    draw_square(sprites[value], x, y, xoff, yoff)
     pal()
-  elseif value == "Y" then
-    if board_square == "." then
-      palt(0, false)
-    end
-    draw_square(sprites["Y"], x, y)
-    pal()
-  elseif value == "G" then
-    if board_square == "." then
-      palt(0, false)
-    end
-    draw_square(sprites["G"], x, y)
-    pal()
-  elseif value == "B" then
-    if board_square == "." then
-      palt(0, false)
-    end
-    draw_square(sprites["B"], x, y)
-    pal()
-  elseif value ~= "." then
-    draw_square(sprites[value], x, y)
   end
 end
 
@@ -318,8 +330,10 @@ function color_for_value(value)
   end
 end
 
-function draw_square(sprite, x, y)
-  sspr(sprite[1], sprite[2], 11, 11, x * 11 + 3, y * 11 + 3)
+function draw_square(sprite, x, y, xoff, yoff)
+  xoff = xoff or 0
+  yoff = yoff or 0
+  sspr(sprite[1], sprite[2], 11, 11, x * 11 + 3 + xoff, y * 11 + 3 + yoff)
 end
 
 function draw_stars(count, twinkle)
