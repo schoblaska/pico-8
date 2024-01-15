@@ -6,7 +6,6 @@ __lua__
 -- by schoblaska
 
 function _init()
-  board_buffer = 3
   stars = {}
   sprites = {
     w = { 38, 12 },
@@ -247,7 +246,7 @@ function draw_tile(tile)
     pal()
 
     -- fill in pixels that match any adjacent G, Y, or B pieces
-    local center = { x = x * 11 + board_buffer + 5, y = y * 11 + board_buffer + 5 }
+    local center = { x = x * 11 + 8, y = y * 11 + 8 }
     local lval = tile_value_at(x - 1, y)
     local rval = tile_value_at(x + 1, y)
     local uval = tile_value_at(x, y - 1)
@@ -320,7 +319,7 @@ function color_for_value(value)
 end
 
 function draw_square(sprite, x, y)
-  sspr(sprite[1], sprite[2], 11, 11, x * 11 + board_buffer, y * 11 + board_buffer)
+  sspr(sprite[1], sprite[2], 11, 11, x * 11 + 3, y * 11 + 3)
 end
 
 function draw_stars(count, twinkle)
@@ -353,13 +352,16 @@ function draw_game()
     draw_stars(300, 5)
   else
     draw_stars(100, 1)
-    rectfill(board_buffer + 9, board_buffer + 9, board_buffer + 111, board_buffer + 111, 1)
-    rectfill(board_buffer + 11, board_buffer + 11, board_buffer + 109, board_buffer + 109, 0)
-    draw_text("arrows: move", 12, 116, 13, 0)
-    draw_text("x: reset", 84, 116, 13, 0)
+    rectfill(11, 11, 115, 115, 0)
+    draw_dotted_line(12, 18, 12, 114, 13)
+    draw_dotted_line(114, 12, 114, 114, 13)
+    draw_dotted_line(18, 12, 114, 12, 13)
+    draw_dotted_line(12, 114, 114, 114, 13)
+    draw_text("arrows: move", 14, 114, 13, 0)
+    draw_text("x: reset", 82, 114, 13, 0)
   end
 
-  draw_text("sokotiles", 12, 6, 7, 0)
+  draw_text("sokotiles", 14, 8, 7, 0)
   draw_board()
   draw_tiles()
 end
@@ -380,6 +382,20 @@ function draw_text(text, x, y, fg, bg)
   end
 
   print(text, x, y, fg)
+end
+
+function draw_dotted_line(x1, y1, x2, y2, color)
+  local dx = x2 - x1
+  local dy = y2 - y1
+  local steps = max(abs(dx), abs(dy))
+  local x_step = dx / steps
+  local y_step = dy / steps
+
+  for i = 0, steps do
+    if i % 6 == 0 then
+      pset(x1 + i * x_step, y1 + i * y_step, color)
+    end
+  end
 end
 
 __gfx__
