@@ -429,10 +429,10 @@ function draw_game()
     -- draw_dotted_line(18, 12, 114, 12, 13)
     -- draw_dotted_line(12, 114, 110, 114, 13)
 
-    draw_text("arrows: move  ❎: reset", 26, 114, 13, 0)
+    draw_text("arrows: move  ❎: reset", 26, 115, 13, 0)
   end
 
-  draw_text("sokotiles", 14, 8, 7, 0)
+  draw_text("sokotiles", 14, 7, 7, 0)
   draw_board()
   draw_tiles()
 end
