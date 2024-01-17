@@ -278,13 +278,13 @@ end
 function update_animations()
   for tile in all(tiles) do
     if tile.x_offset ~= 0 and sgn(tile.x_offset) == 1 then
-      tile.x_offset = max(tile.x_offset - sgn(tile.x_offset) * 2, 0)
+      tile.x_offset = max(tile.x_offset - sgn(tile.x_offset) * 3, 0)
     elseif tile.x_offset ~= 0 and sgn(tile.x_offset) == -1 then
-      tile.x_offset = min(tile.x_offset - sgn(tile.x_offset) * 2, 0)
+      tile.x_offset = min(tile.x_offset - sgn(tile.x_offset) * 3, 0)
     elseif tile.y_offset ~= 0 and sgn(tile.y_offset) == 1 then
-      tile.y_offset = max(tile.y_offset - sgn(tile.y_offset) * 2, 0)
+      tile.y_offset = max(tile.y_offset - sgn(tile.y_offset) * 3, 0)
     elseif tile.y_offset ~= 0 and sgn(tile.y_offset) == -1 then
-      tile.y_offset = min(tile.y_offset - sgn(tile.y_offset) * 2, 0)
+      tile.y_offset = min(tile.y_offset - sgn(tile.y_offset) * 3, 0)
     end
   end
 end
