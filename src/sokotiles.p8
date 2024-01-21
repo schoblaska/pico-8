@@ -6,6 +6,12 @@ __lua__
 -- by schoblaska
 
 function _init()
+  config = {
+    tilew = 11,
+    boardxy = 14, -- top-left corner of board
+    grids = 9
+  }
+
   stars = {}
   sprites = {
     W = { 0, 0 },
@@ -101,9 +107,9 @@ function load_level()
   board = {}
   tiles = {}
 
-  for x = 1, 9 do
+  for x = 1, config.grids do
     board[x] = {}
-    for y = 1, 9 do
+    for y = 1, config.grids do
       map_sprite = mget(x - 1, y - 1)
       if board_map_sprites[map_sprite] then
         board[x][y] = board_map_sprites[map_sprite]
@@ -183,7 +189,7 @@ function able_to_move(x, y, dx, dy, pusher_push, block_push)
   local target_x = x + dx
   local target_y = y + dy
 
-  if target_x < 1 or target_x > 9 or target_y < 1 or target_y > 9 then
+  if target_x < 1 or target_x > config.grids or target_y < 1 or target_y > config.grids then
     return false
   end
 
@@ -219,8 +225,8 @@ function move_tile(x, y, target_x, target_y)
 
   tile.x = target_x
   tile.y = target_y
-  tile.x_offset = (x - target_x) * 11
-  tile.y_offset = (y - target_y) * 11
+  tile.x_offset = (x - target_x) * config.tilew
+  tile.y_offset = (y - target_y) * config.tilew
 
   reset_cache()
 end
@@ -235,8 +241,8 @@ function is_won()
   end
 
   local check_is_won = function()
-    for x = 1, 9 do
-      for y = 1, 9 do
+    for x = 1, config.grids do
+      for y = 1, config.grids do
         local board_square = board[x][y]
         local tile_value = tile_value_at(x, y)
 
@@ -290,13 +296,13 @@ function update_animations()
 end
 
 function draw_board()
-  for x = 1, 9 do
-    for y = 1, 9 do
+  for x = 1, config.grids do
+    for y = 1, config.grids do
       local board_square = board[x][y]
 
       if board_square == "." then
         if not is_won() then
-          pset(x * 11 + 8, y * 11 + 8, 5)
+          pset(x * config.tilew + 8, y * config.tilew + 8, 5)
         end
       else
         draw_square(sprites[board_square], x, y)
@@ -335,7 +341,7 @@ function draw_tile(tile)
     pal()
 
     -- fill in pixels that match any adjacent G, Y, or B pieces
-    local center = { x = x * 11 + 8 + tile.x_offset, y = y * 11 + 8 + tile.y_offset }
+    local center = { x = x * config.tilew + 8 + tile.x_offset, y = y * config.tilew + 8 + tile.y_offset }
     local lval = adjacent_tile_val(tile, -1, 0)
     local rval = adjacent_tile_val(tile, 1, 0)
     local uval = adjacent_tile_val(tile, 0, -1)
@@ -347,7 +353,7 @@ function draw_tile(tile)
       line(center.x + 4, center.y + 1, center.x + 4, center.y - 1, color)
     end
 
-    if x < 9 and (rval == "G" or rval == "B") then
+    if x < config.grids and (rval == "G" or rval == "B") then
       local color = color_for_value(rval)
       line(center.x - 3, center.y, center.x - 4, center.y, color)
       line(center.x - 4, center.y + 1, center.x - 4, center.y - 1, color)
@@ -359,7 +365,7 @@ function draw_tile(tile)
       line(center.x + 1, center.y + 4, center.x - 1, center.y + 4, color)
     end
 
-    if y < 9 and (dval == "G" or dval == "Y") then
+    if y < config.grids and (dval == "G" or dval == "Y") then
       local color = color_for_value(dval)
       line(center.x, center.y - 3, center.x, center.y - 4, color)
       line(center.x + 1, center.y - 4, center.x - 1, center.y - 4, color)
@@ -390,7 +396,11 @@ end
 function draw_square(sprite, x, y, xoff, yoff)
   xoff = xoff or 0
   yoff = yoff or 0
-  sspr(sprite[1], sprite[2], 11, 11, x * 11 + 3 + xoff, y * 11 + 3 + yoff)
+  sspr(
+    sprite[1], sprite[2], config.tilew, config.tilew,
+    (x - 1) * config.tilew + config.boardxy + xoff,
+    (y - 1) * config.tilew + config.boardxy + yoff
+  )
 end
 
 function draw_stars(count, twinkle)
@@ -423,16 +433,23 @@ function draw_game()
     draw_stars(300, 5)
   else
     draw_stars(100, 1)
-    rectfill(11, 11, 115, 115, 0)
-    -- draw_dotted_line(12, 18, 12, 114, 13)
-    -- draw_dotted_line(114, 12, 114, 110, 13)
-    -- draw_dotted_line(18, 12, 114, 12, 13)
-    -- draw_dotted_line(12, 114, 110, 114, 13)
-
-    draw_text("arrows: move  ❎: reset", 26, 115, 13, 0)
+    rectfill(
+      config.boardxy - 2,
+      config.boardxy - 2,
+      config.boardxy + config.tilew * config.grids + 1,
+      config.boardxy + config.tilew * config.grids + 1,
+      0
+    )
+    draw_text(
+      "arrows: move  ❎: reset",
+      config.boardxy + config.grids * config.tilew - 91,
+      config.boardxy + config.grids * config.tilew + 2,
+      13,
+      0
+    )
   end
 
-  draw_text("sokotiles", 14, 7, 7, 0)
+  draw_text("sokotiles", config.boardxy, config.boardxy - 7, 7, 0)
   draw_board()
   draw_tiles()
 end
@@ -442,14 +459,27 @@ function draw_title()
 
   draw_stars(100, 1)
   sspr(0, 109, 128, 18, 0, 32)
-  draw_text("play", menu_xy.x, menu_xy.y, 7, 0)
-  draw_text("tutorial", menu_xy.x, menu_xy.y + 8, 5, 0)
+  draw_text("new game", menu_xy.x, menu_xy.y, 7, 0)
+  draw_text("continue", menu_xy.x, menu_xy.y + 8, 5, 0)
   draw_text(">", menu_xy.x - 5, menu_xy.y + title_menu_selection * 8, 7, 0)
 end
 
 function draw_text(text, x, y, fg, bg)
   if bg then
-    rectfill(x - 1, y - 1, x + #text * 4 - 1, y + 5, bg)
+    local width = -1
+
+    for i = 1, #text do
+      local char = sub(text, i, i)
+      local char_ord = ord(char)
+
+      if char_ord < 128 then
+        width += 4
+      else
+        width += 8 -- for double-width characters like "❎"
+      end
+    end
+
+    rectfill(x - 1, y - 1, x + width, y + 5, bg)
   end
 
   print(text, x, y, fg)
