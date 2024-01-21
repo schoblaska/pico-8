@@ -13,6 +13,7 @@ function _init()
   }
 
   stars = {}
+
   sprites = {
     W = { 0, 0 },
     B = { 0, 11 },
@@ -25,6 +26,7 @@ function _init()
     g = { 44, 0 },
     y = { 44, 11 }
   }
+
   tile_map_sprites = {
     [10] = "W",
     [26] = "B",
@@ -33,12 +35,14 @@ function _init()
     [12] = "P",
     [28] = "E"
   }
+
   board_map_sprites = {
     [13] = "w",
     [29] = "b",
     [14] = "g",
     [30] = "y"
   }
+
   reset_cache()
   load_level()
   set_scene("title")
