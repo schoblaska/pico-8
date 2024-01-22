@@ -499,8 +499,8 @@ function draw_game()
 
   draw_text("sokotiles", config.boardxy, config.boardxy - 7, 7, 0)
   draw_text(
-    "lvl " .. zeropad(current_level, 3),
-    config.boardxy + config.tilew * config.grids - 27,
+    "l" .. zeropad(current_level, 3),
+    config.boardxy + config.tilew * config.grids - 15,
     config.boardxy - 7,
     13,
     0
