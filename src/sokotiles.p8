@@ -73,7 +73,8 @@ function _update60()
       elseif btnp(3) then
         move_if_able(player.x, player.y, 0, 1, false, false)
       elseif btnp(5) and not is_won() then
-        load_level()
+        load_level(current_level)
+        reset_cache()
       elseif is_won() and more_levels() and btnp(4) then
         current_level += 1
         load_level(current_level)
