@@ -9,9 +9,11 @@ function _init()
   config = {
     tilew = 11,
     boardxy = 14, -- top-left corner of board
-    grids = 9
+    grids = 9,
+    levels = 4
   }
 
+  current_level = 1
   stars = {}
 
   sprites = {
@@ -44,7 +46,6 @@ function _init()
   }
 
   reset_cache()
-  load_level()
   set_scene("title")
 end
 
@@ -73,6 +74,10 @@ function _update60()
         move_if_able(player.x, player.y, 0, 1, false, false)
       elseif btnp(5) and not is_won() then
         load_level()
+      elseif is_won() and more_levels() and btnp(4) then
+        current_level += 1
+        load_level(current_level)
+        reset_cache()
       end
     end
   end
@@ -107,14 +112,17 @@ function in_cache(key)
   return cache_keys[key]
 end
 
-function load_level()
+function load_level(n)
   board = {}
   tiles = {}
+
+  local myoffset = flr((n - 1) / 12) * 10
+  local mxoffset = (n - 1) % 12 * 10
 
   for x = 1, config.grids do
     board[x] = {}
     for y = 1, config.grids do
-      map_sprite = mget(x - 1, y - 1)
+      map_sprite = mget(x - 1 + mxoffset, y - 1 + myoffset)
       if board_map_sprites[map_sprite] then
         board[x][y] = board_map_sprites[map_sprite]
       else
@@ -139,6 +147,9 @@ end
 function set_scene(new_scene)
   if new_scene == "title" then
     title_menu_selection = 0
+  else
+    load_level(current_level)
+    reset_cache()
   end
 
   scene = new_scene
@@ -175,6 +186,10 @@ function tile_value_at(x, y)
   else
     return tile.value
   end
+end
+
+function more_levels()
+  return current_level < config.levels
 end
 
 function move_if_able(x, y, dx, dy, pusher_push, block_push)
@@ -321,6 +336,16 @@ function draw_tiles()
   end
 end
 
+function zeropad(n, width)
+  local s = tostring(n)
+
+  while #s < width do
+    s = "0" .. s
+  end
+
+  return s
+end
+
 function adjacent_tile_val(tile, dx, dy)
   local adj_tile = tile_at(tile.x + dx, tile.y + dy)
 
@@ -435,6 +460,24 @@ end
 function draw_game()
   if is_won() then
     draw_stars(300, 5)
+
+    if more_levels() then
+      draw_text(
+        "🅾️: next level",
+        config.boardxy + config.grids * config.tilew - 54,
+        config.boardxy + config.grids * config.tilew + 2,
+        13,
+        0
+      )
+    else
+      draw_text(
+        "you win!",
+        config.boardxy + config.grids * config.tilew - 31,
+        config.boardxy + config.grids * config.tilew + 2,
+        7,
+        0
+      )
+    end
   else
     draw_stars(100, 1)
     rectfill(
@@ -454,6 +497,13 @@ function draw_game()
   end
 
   draw_text("sokotiles", config.boardxy, config.boardxy - 7, 7, 0)
+  draw_text(
+    "lvl " .. zeropad(current_level, 3),
+    config.boardxy + config.tilew * config.grids - 27,
+    config.boardxy - 7,
+    13,
+    0
+  )
   draw_board()
   draw_tiles()
 end
