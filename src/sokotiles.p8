@@ -337,7 +337,7 @@ function draw_tiles()
 end
 
 function zeropad(n, width)
-  local s = tostring(n)
+  local s = tostr(n)
 
   while #s < width do
     s = "0" .. s
