@@ -4,11 +4,20 @@ Messing around with the [PICO-8](http://pico-8.com).
 <table>
   <tr>
     <td valign="top" width="999">
+      <a href="https://schoblaska.github.io/pico-8/kaido.html">
+        <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/kaido.p8.png" align="right">
+      </a>
+      <h3>Kaido</h3>
+      <p>A doodle. Exploring some ideas around a game where you just wander down a long pedestrian road, as the wind blows leaves and blossoms across the landscape.</p>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" width="999">
       <a href="https://schoblaska.github.io/pico-8/tvstatic.html">
         <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/tvstatic.p8.png" align="right">
       </a>
       <h3>TV Static</h3>
-      <p>Experimenting with a TV static effect.
+      <p>Experimenting with a TV static effect.</p>
     </td>
   </tr>
   <tr>
