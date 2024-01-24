@@ -84,13 +84,17 @@ function _update60()
   if btnp(0) and player_can_move_to(player.x - 1, player.y) then
     player.x -= 1
     player.flip = true
+    displace_leaf(player.x, player.y, -1, 0)
   elseif btnp(1) and player_can_move_to(player.x + 1, player.y) then
     player.x += 1
     player.flip = false
+    displace_leaf(player.x, player.y, 1, 0)
   elseif btnp(2) and player_can_move_to(player.x, player.y - 1) then
     player.y -= 1
+    displace_leaf(player.x, player.y, 0, -1)
   elseif btnp(3) and player_can_move_to(player.x, player.y + 1) then
     player.y += 1
+    displace_leaf(player.x, player.y, 0, 1)
   end
 
   spawn_leaves()
@@ -247,6 +251,34 @@ function leaf_at(x, y)
   end
 
   return false
+end
+
+function displace_leaf(x, y, dx, dy)
+  if not leaf_at(x, y) then
+    return
+  end
+
+  vectors = {
+    { dx, dy },
+    { -1, -1 },
+    { -1, 1 },
+    { 0, -1 },
+    { 0, 1 },
+    { 1, -1 },
+    { 1, 1 },
+    { -1, 0 },
+    { 1, 0 }
+  }
+
+  for vector in all(vectors) do
+    for leaf in all(leaves) do
+      if leaf.x == x and leaf.y == y and leaf_can_move_to(x + vector[1], y + vector[2]) then
+        leaf.x += vector[1]
+        leaf.y += vector[2]
+        return
+      end
+    end
+  end
 end
 
 __gfx__
