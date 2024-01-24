@@ -17,11 +17,23 @@ __lua__
 function _init()
   sprites = {
     gust = 41,
-    path = 32
+    path = 32,
+    leaves = {
+      { x = 8, y = 8 },
+      { x = 16, y = 8 },
+      { x = 24, y = 8 },
+      { x = 32, y = 8 }
+    }
   }
 
-  -- higher = slower
+  -- higher = slower wind
   windspeed = 50
+  -- higher = fewer leaves
+  leafspawn = 150
+  -- higher = slower
+  leafrot = 50
+  -- higher = slower
+  leafspeed = 50
 
   gusts = {
     {
@@ -37,6 +49,21 @@ function _init()
   }
 
   leaves = {}
+
+  for x = 0, 15 do
+    for y = 0, 15 do
+      if not fget(mget(x, y), 3) and rnd(leafspawn / 6) < 1 then
+        add(
+          leaves, {
+            x = x,
+            y = y,
+            sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
+            rotation = 0
+          }
+        )
+      end
+    end
+  end
 end
 
 function _update60()
@@ -45,6 +72,9 @@ function _update60()
       gust.offset += 1
     end
   end
+
+  spawn_leaves()
+  update_leaves()
 end
 
 function _draw()
@@ -63,6 +93,75 @@ function _draw()
       end
     end
   end
+
+  for leaf in all(leaves) do
+    sspr(
+      leaf.sprite.x,
+      leaf.sprite.y,
+      8,
+      8,
+      leaf.x * 8,
+      leaf.y * 8,
+      8,
+      8,
+      leaf.rotation == 90 or leaf.rotation == 270,
+      leaf.rotation == 180 or leaf.rotation == 270
+    )
+  end
+end
+
+function spawn_leaves()
+  if rnd(leafspawn) < 1 then
+    local x = 15
+    local y = flr(rnd(16))
+
+    if not leaf_at(x, y) then
+      add(
+        leaves, {
+          x = x,
+          y = y,
+          sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
+          rotation = 0
+        }
+      )
+    end
+  end
+end
+
+function update_leaves()
+  for leaf in all(leaves) do
+    if leaf.x < 0 then
+      del(leaves, leaf)
+    elseif is_gusting(leaf.x, leaf.y) then
+      if rnd(leafrot) < 1 then
+        leaf.rotation = (leaf.rotation - 90) % 360
+      end
+
+      if rnd(leafspeed) < 1 then
+        if can_move_to(leaf.x - 1, leaf.y) then
+          leaf.x -= 1
+        elseif can_move_to(leaf.x - 1, leaf.y - 1) then
+          leaf.x -= 1
+          leaf.y -= 1
+        elseif can_move_to(leaf.x - 1, leaf.y + 1) then
+          leaf.x -= 1
+          leaf.y += 1
+        end
+      end
+    end
+  end
+end
+
+function can_move_to(x, y)
+  if x < 0 then
+    return true
+  elseif fget(mget(x, y), 3) then
+    return false
+  elseif leaf_at(x, y) then
+    return false
+  else
+    return true
+  end
 end
 
 function is_gusting(x, y)
@@ -70,6 +169,16 @@ function is_gusting(x, y)
     local mapx = gust.mapx * 16 + (gust.offset + x) % 16
 
     if mget(mapx, y) == sprites.gust then
+      return true
+    end
+  end
+
+  return false
+end
+
+function leaf_at(x, y)
+  for leaf in all(leaves) do
+    if leaf.x == x and leaf.y == y then
       return true
     end
   end
