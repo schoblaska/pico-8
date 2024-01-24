@@ -8,7 +8,8 @@ Messing around with the [PICO-8](http://pico-8.com).
         <img src="https://raw.githubusercontent.com/schoblaska/pico-8/master/carts/kaido.p8.png" align="right">
       </a>
       <h3>Kaido</h3>
-      <p>A doodle. Exploring some ideas around a game where you just wander down a long pedestrian road, as the wind blows leaves and blossoms across the landscape.</p>
+      <p>A doodle on the idea of a walking path on a windy day.</p>
+      <p>Music by <a href="https://www.lexaloffle.com/bbs/?tid=33675">Gruber</a>.</p>
     </td>
   </tr>
   <tr>
