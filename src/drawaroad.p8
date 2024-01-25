@@ -13,7 +13,7 @@ function _init()
 
   for x = 0, 127 do
     for y = 0, 15 do
-      mset(x, y, sprites.grass[flr(rnd(2)) + 1])
+      mset(x, y, sample(sprites.grass))
     end
   end
 
