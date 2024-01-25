@@ -17,7 +17,7 @@ function _init()
     end
   end
 
-  draw_a_road(12, 0, 8, -1)
+  draw_a_road(0, 0, 128, 1)
 end
 
 function _update()
