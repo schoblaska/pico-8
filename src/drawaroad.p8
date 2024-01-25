@@ -74,6 +74,8 @@ function draw_a_road()
       s = -1
     end
 
+    -- draw an extra road tile whenever height changes
+    -- without it, the road looks narrow on steeper slopes
     if flr(h + s) > flr(h) then
       mset(x, flr(h - g), sample(sprites.road))
     elseif flr(h + s) < flr(h) then
