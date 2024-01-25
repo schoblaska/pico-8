@@ -17,7 +17,7 @@ function _init()
     end
   end
 
-  draw_a_road()
+  draw_a_road(12, 0, 8, -1)
 end
 
 function _update()
@@ -36,56 +36,56 @@ function _draw()
   end
 end
 
-function draw_a_road()
-  local h = 8
-  local g = 1
+function draw_a_road(sx, sy, w, dx)
+  local height = 8
+  local thickness = 1
 
   -- slope: -1 to +1
-  local s = 0
+  local slope = 0
 
   -- wobble: how many steps to draw before potentially changing direction
-  local w = 4
+  local wobble = 4
 
-  -- bleed: how close do we let the road get to the edge of the screen?
-  local b = 4
+  -- how close do we let the road get to the edge of the screen?
+  local bleed = 4
 
-  for x = 0, 127 do
-    if h < b then
-      h = b
-    elseif h > 15 - b then
-      h = 15 - b
+  for x = sx, sx + dx * w - 1, dx do
+    if height < bleed then
+      height = bleed
+    elseif height > 15 - bleed then
+      height = 15 - bleed
     end
 
-    if x % w == 0 then
-      if h == b then
-        s = 0 + sample({ 0, 0.5, 0.5 })
-      elseif h == 15 - b then
-        s = 0 - sample({ 0, 0.5, 0.5 })
-      elseif s == 0 then
-        s += sample({ -0.25, 0.25 })
+    if x % wobble == 0 then
+      if height == bleed then
+        slope = 0 + sample({ 0, 0.5, 0.5 })
+      elseif height == 15 - bleed then
+        slope = 0 - sample({ 0, 0.5, 0.5 })
+      elseif slope == 0 then
+        slope += sample({ -0.25, 0.25 })
       else
-        s += sample({ 0, 0, -0.25, 0.25 })
+        slope += sample({ 0, 0, -0.25, 0.25 })
       end
     end
 
-    if s > 1 then
-      s = 1
-    elseif s < -1 then
-      s = -1
+    if slope > 1 then
+      slope = 1
+    elseif slope < -1 then
+      slope = -1
     end
 
     -- draw an extra road tile whenever height changes
     -- without it, the road looks narrow on steeper slopes
-    if flr(h + s) > flr(h) then
-      mset(x, flr(h - g), sample(sprites.road))
-    elseif flr(h + s) < flr(h) then
-      mset(x, flr(h + g), sample(sprites.road))
+    if flr(height + slope) > flr(height) then
+      mset(x, sy + flr(height - thickness), sample(sprites.road))
+    elseif flr(height + slope) < flr(height) then
+      mset(x, sy + flr(height + thickness), sample(sprites.road))
     end
 
-    h += s
+    height += slope
 
-    for yoff = -g, g do
-      mset(x, flr(h + yoff), sample(sprites.road))
+    for yoff = -thickness, thickness do
+      mset(x, sy + flr(height + yoff), sample(sprites.road))
     end
   end
 end
