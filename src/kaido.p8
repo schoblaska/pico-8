@@ -4,6 +4,7 @@ __lua__
 
 -- kaido - by schoblaska
 -- music by gruber <3
+--
 
 -- flags
 -- 0: tumbles (like a leaf)
@@ -15,6 +16,8 @@ __lua__
 -- 6: gusts (like wind)
 
 function _init()
+  mapwidth = 48
+
   sprites = {
     gust = 41,
     path = 32,
@@ -45,22 +48,24 @@ function _init()
     flip = false
   }
 
-  gusts = {
-    {
-      offset = 0,
-      speed = 2,
-      mapx = 1
-    },
-    {
-      offset = 0,
-      speed = 10,
-      mapx = 2
-    }
-  }
+  -- gusts = {
+  --   {
+  --     offset = 0,
+  --     speed = 2,
+  --     mapx = 1
+  --   },
+  --   {
+  --     offset = 0,
+  --     speed = 10,
+  --     mapx = 2
+  --   }
+  -- }
+
+  gusts = {}
 
   leaves = {}
 
-  for x = 0, 15 do
+  for x = 0, mapwidth - 1 do
     for y = 0, 15 do
       if not fget(modmget(x, y), 3) and rnd(leafspawn / 6) < 1 then
         add(
@@ -68,7 +73,7 @@ function _init()
             x = x,
             y = y,
             sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
-            rotation = 0
+            rotation = sample({ 0, 90, 180, 270 })
           }
         )
       end
@@ -138,7 +143,7 @@ function _draw()
       leaf.sprite.y,
       8,
       8,
-      leaf.x * 8,
+      (leaf.x - cam_offset) * 8,
       leaf.y * 8,
       8,
       8,
@@ -178,7 +183,7 @@ function _draw()
 end
 
 function modxy(x, y)
-  return x % 48 + 32, y
+  return x % mapwidth + 32, y
 end
 
 function modmget(x, y)
@@ -190,29 +195,9 @@ function sample(array)
   return array[flr(rnd(#array)) + 1]
 end
 
-function spawn_leaves()
-  if rnd(leafspawn) < 1 then
-    local x = 15
-    local y = flr(rnd(16))
-
-    if not leaf_at(x, y) then
-      add(
-        leaves, {
-          x = x,
-          y = y,
-          sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
-          rotation = 0
-        }
-      )
-    end
-  end
-end
-
 function update_leaves()
   for leaf in all(leaves) do
-    if leaf.x < 0 then
-      del(leaves, leaf)
-    elseif is_gusting(leaf.x, leaf.y) then
+    if is_gusting(leaf.x, leaf.y) then
       if rnd(leafrot) < 1 then
         leaf.rotation = (leaf.rotation - 90) % 360
       end
