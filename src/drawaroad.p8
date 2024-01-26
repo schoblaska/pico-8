@@ -17,7 +17,7 @@ function _init()
     end
   end
 
-  draw_a_road(0, 0, 128, 1)
+  draw_a_road(0, 0, 4, 128, 1)
 end
 
 function _update()
@@ -36,8 +36,8 @@ function _draw()
   end
 end
 
-function draw_a_road(sx, sy, w, dx)
-  local height = 8
+function draw_a_road(sx, sy, sh, w, dx)
+  local height = sh
   local thickness = 1
 
   -- slope: -1 to +1
@@ -58,11 +58,15 @@ function draw_a_road(sx, sy, w, dx)
 
     if x % wobble == 0 then
       if height == bleed then
-        slope = 0 + sample({ 0, 0.5, 0.5 })
+        slope = 0 + sample({ 0, 0.25, 0.5, 0.5 })
       elseif height == 15 - bleed then
-        slope = 0 - sample({ 0, 0.5, 0.5 })
+        slope = 0 + sample({ 0, -0.25, -0.5, -0.5 })
       elseif slope == 0 then
-        slope += sample({ -0.25, 0.25 })
+        slope += sample({ 0, -0.25, -0.25, 0.25, 0.25 })
+      elseif slope > 0.5 then
+        slope += sample({ 0, -0.5, -0.25, 0.25 })
+      elseif slope < 0.5 then
+        slope += sample({ 0, 0.5, 0.25, -0.25 })
       else
         slope += sample({ 0, 0, -0.25, 0.25 })
       end
@@ -88,6 +92,8 @@ function draw_a_road(sx, sy, w, dx)
       mset(x, sy + flr(height + yoff), sample(sprites.road))
     end
   end
+
+  return height
 end
 
 function sample(array)
