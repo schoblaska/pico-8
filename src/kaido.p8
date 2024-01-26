@@ -195,6 +195,24 @@ function sample(array)
   return array[flr(rnd(#array)) + 1]
 end
 
+function spawn_leaves()
+  if rnd(leafspawn) < 1 then
+    local x = 15
+    local y = flr(rnd(16))
+
+    if not leaf_at(x, y) then
+      add(
+        leaves, {
+          x = x,
+          y = y,
+          sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
+          rotation = 0
+        }
+      )
+    end
+  end
+end
+
 function update_leaves()
   for leaf in all(leaves) do
     if is_gusting(leaf.x, leaf.y) then
