@@ -149,7 +149,7 @@ function _draw()
 
   for y = 0, 15 do
     for x = 0, 15 do
-      local sprite = modmget(x, y)
+      local sprite = modmget(cam_offset + x, y)
 
       if player.x - cam_offset == x and player.y == y then
         palt(0, false)
