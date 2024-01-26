@@ -112,7 +112,6 @@ function _update60()
     cam_offset = player.x - 6
   end
 
-  spawn_leaves()
   update_leaves()
 end
 
@@ -138,18 +137,27 @@ function _draw()
   end
 
   for leaf in all(leaves) do
-    sspr(
-      leaf.sprite.x,
-      leaf.sprite.y,
-      8,
-      8,
-      (leaf.x - cam_offset) * 8,
-      leaf.y * 8,
-      8,
-      8,
-      leaf.rotation == 90 or leaf.rotation == 270,
-      leaf.rotation == 180 or leaf.rotation == 270
-    )
+    local exxes = {
+      (leaf.x - cam_offset) % mapwidth * 8,
+      (leaf.x - cam_offset % mapwidth + mapwidth) % mapwidth * 8
+    }
+
+    for x in all(exxes) do
+      if x >= 0 and x <= 128 then
+        sspr(
+          leaf.sprite.x,
+          leaf.sprite.y,
+          8,
+          8,
+          x,
+          leaf.y * 8,
+          8,
+          8,
+          leaf.rotation == 90 or leaf.rotation == 270,
+          leaf.rotation == 180 or leaf.rotation == 270
+        )
+      end
+    end
   end
 
   for y = 0, 15 do
@@ -179,7 +187,9 @@ function _draw()
     end
   end
 
-  print(cam_offset)
+  local modx, mody = modxy(player.x, player.y)
+  print(modx .. ", " .. mody)
+  print("cam offset: " .. cam_offset)
 end
 
 function modxy(x, y)
@@ -193,24 +203,6 @@ end
 
 function sample(array)
   return array[flr(rnd(#array)) + 1]
-end
-
-function spawn_leaves()
-  if rnd(leafspawn) < 1 then
-    local x = 15
-    local y = flr(rnd(16))
-
-    if not leaf_at(x, y) then
-      add(
-        leaves, {
-          x = x,
-          y = y,
-          sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
-          rotation = 0
-        }
-      )
-    end
-  end
 end
 
 function update_leaves()
@@ -267,7 +259,7 @@ end
 
 function leaf_at(x, y)
   for leaf in all(leaves) do
-    if leaf.x == x and leaf.y == y then
+    if leaf.x == x % mapwidth and leaf.y == y then
       return true
     end
   end
@@ -276,7 +268,9 @@ function leaf_at(x, y)
 end
 
 function displace_leaf(x, y, dx, dy)
-  if not leaf_at(x, y) then
+  local modx = x % mapwidth
+
+  if not leaf_at(modx, y) then
     return
   end
 
@@ -292,12 +286,14 @@ function displace_leaf(x, y, dx, dy)
     { 1, 0 }
   }
 
-  for vector in all(vectors) do
-    for leaf in all(leaves) do
-      if leaf.x == x and leaf.y == y and leaf_can_move_to(x + vector[1], y + vector[2]) then
-        leaf.x += vector[1]
-        leaf.y += vector[2]
-        return
+  for leaf in all(leaves) do
+    if leaf.x == modx and leaf.y == y then
+      for vector in all(vectors) do
+        if leaf_can_move_to(modx + vector[1], y + vector[2]) then
+          leaf.x += vector[1]
+          leaf.y += vector[2]
+          return
+        end
       end
     end
   end
