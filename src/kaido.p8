@@ -28,6 +28,8 @@ function _init()
     player = 57
   }
 
+  cam_offset = 0
+
   -- higher = slower wind
   windspeed = 50
   -- higher = fewer leaves
@@ -73,7 +75,7 @@ function _init()
     end
   end
 
-  music(39)
+  -- music(39)
 end
 
 function _update60()
@@ -99,6 +101,12 @@ function _update60()
     displace_leaf(player.x, player.y, 0, 1)
   end
 
+  if player.x > cam_offset + 9 then
+    cam_offset = player.x - 9
+  elseif player.x < cam_offset + 6 then
+    cam_offset = player.x - 6
+  end
+
   spawn_leaves()
   update_leaves()
 end
@@ -106,7 +114,7 @@ end
 function _draw()
   for y = 0, 15 do
     for x = 0, 15 do
-      local sprite = modmget(x, y)
+      local sprite = modmget(cam_offset + x, y)
 
       if fget(sprite, 5) then
         spr(sprites.path, x * 8, y * 8)
@@ -143,7 +151,7 @@ function _draw()
     for x = 0, 15 do
       local sprite = modmget(x, y)
 
-      if player.x == x and player.y == y then
+      if player.x - cam_offset == x and player.y == y then
         palt(0, false)
         palt(11, true)
 
@@ -165,6 +173,8 @@ function _draw()
       end
     end
   end
+
+  print(cam_offset)
 end
 
 function modxy(x, y)
@@ -237,13 +247,7 @@ function leaf_can_move_to(x, y)
 end
 
 function player_can_move_to(x, y)
-  if x < 0 or x > 15 or y < 0 or y > 15 then
-    return false
-  elseif fget(modmget(x, y), 3) then
-    return false
-  else
-    return true
-  end
+  return not fget(modmget(x, y), 3)
 end
 
 function is_gusting(x, y)
