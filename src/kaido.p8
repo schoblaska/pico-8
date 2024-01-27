@@ -52,22 +52,12 @@ function _init()
     move = entity_move
   }
 
-  -- gusts = {
-  --   {
-  --     offset = 0,
-  --     speed = 2,
-  --     mapx = 1
-  --   },
-  --   {
-  --     offset = 0,
-  --     speed = 10,
-  --     mapx = 2
-  --   }
-  -- }
-
   gusts = {}
-
   leaves = {}
+
+  for n = 1, flr(mapwidth / 16) do
+    add(gusts, { x = flr(rnd(mapwidth)), speed = flr(rnd(10) + 3), mapx = flr(rnd(2) + 1) })
+  end
 
   -- TODO: replace with refresh_leaves()
   for x = 0, mapwidth - 1 do
@@ -92,7 +82,7 @@ end
 function _update60()
   for gust in all(gusts) do
     if rnd(windspeed) < gust.speed then
-      gust.offset += 1
+      gust.x = (gust.x - 1) % mapwidth
     end
   end
 
@@ -112,9 +102,15 @@ function _update60()
     displace_leaf(player.x, player.y, 0, 1)
   end
 
-  if mcam_offset() + 5 > player.x then
+  -- the camera offset is always left of the player
+  -- if cam_offset is greater than player.x, it means that the offset
+  -- has "looped" around the map but the player has not
+  -- subtracting mapwidth from cam_offset makes comparison easier
+  local mcam_offset = cam_offset > player.x and cam_offset - mapwidth or cam_offset
+
+  if mcam_offset + 5 > player.x then
     cam_offset = (cam_offset - 1) % mapwidth
-  elseif mcam_offset() + 10 < player.x then
+  elseif mcam_offset + 10 < player.x then
     cam_offset = (cam_offset + 1) % mapwidth
   end
 
@@ -179,6 +175,8 @@ function _draw()
       end
     end
   end
+
+  print("cpu: " .. stat(1), 1, 1, 6)
 end
 
 function modmget(x, y)
@@ -225,13 +223,11 @@ function update_leaves()
 
       if rnd(leafspeed) < 1 then
         if leaf_can_move_to(leaf.x - 1, leaf.y) then
-          leaf.x -= 1
+          leaf:move(-1, 0)
         elseif leaf_can_move_to(leaf.x - 1, leaf.y - 1) then
-          leaf.x -= 1
-          leaf.y -= 1
+          leaf:move(-1, -1)
         elseif leaf_can_move_to(leaf.x - 1, leaf.y + 1) then
-          leaf.x -= 1
-          leaf.y += 1
+          leaf:move(-1, 1)
         end
       end
     end
@@ -258,20 +254,16 @@ function player_can_move_to(x, y)
   end
 end
 
--- the camera offset is always left of the player
--- if cam_offset is greater than player.x, it means that the offset
--- has "looped" around the map but the player has not
--- subtracting mapwidth from cam_offset makes comparison possible
-function mcam_offset()
-  return cam_offset > player.x and cam_offset - mapwidth or cam_offset
-end
-
 function is_gusting(x, y)
   for gust in all(gusts) do
-    local mapx = gust.mapx * 16 + (gust.offset + x) % 16
+    local mgustx = gust.x > x and gust.x - mapwidth or gust.x
 
-    if modmget(mapx, y) == sprites.gust then
-      return true
+    if x >= mgustx and x <= mgustx + 16 then
+      local mapx = gust.mapx + x - mgustx
+
+      if mget(mapx, y) == sprites.gust then
+        return true
+      end
     end
   end
 
