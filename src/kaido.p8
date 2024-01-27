@@ -45,7 +45,8 @@ function _init()
   player = {
     x = 8,
     y = 8,
-    flip = false
+    flip = false,
+    move = entity_move
   }
 
   -- gusts = {
@@ -65,6 +66,7 @@ function _init()
 
   leaves = {}
 
+  -- TODO: replace with refresh_leaves()
   for x = 0, mapwidth - 1 do
     for y = 0, 15 do
       if not fget(modmget(x, y), 3) and rnd(leafspawn / 6) < 1 then
@@ -73,7 +75,8 @@ function _init()
             x = x,
             y = y,
             sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
-            rotation = sample({ 0, 90, 180, 270 })
+            rotation = sample({ 0, 90, 180, 270 }),
+            move = entity_move
           }
         )
       end
@@ -91,34 +94,37 @@ function _update60()
   end
 
   if btnp(0) and player_can_move_to(player.x - 1, player.y) then
-    player.x -= 1
+    player:move(-1, 0)
     player.flip = true
     displace_leaf(player.x, player.y, -1, 0)
   elseif btnp(1) and player_can_move_to(player.x + 1, player.y) then
-    player.x += 1
+    player:move(1, 0)
     player.flip = false
     displace_leaf(player.x, player.y, 1, 0)
   elseif btnp(2) and player_can_move_to(player.x, player.y - 1) then
-    player.y -= 1
+    player:move(0, -1)
     displace_leaf(player.x, player.y, 0, -1)
   elseif btnp(3) and player_can_move_to(player.x, player.y + 1) then
-    player.y += 1
+    player:move(0, 1)
     displace_leaf(player.x, player.y, 0, 1)
   end
 
-  if player.x > cam_offset + 9 then
-    cam_offset = player.x - 9
-  elseif player.x < cam_offset + 6 then
-    cam_offset = player.x - 6
+  mcam_offset = cam_offset > player.x and cam_offset - mapwidth or cam_offset
+
+  if mcam_offset + 5 > player.x then
+    cam_offset = (cam_offset - 1) % mapwidth
+  elseif mcam_offset + 10 < player.x then
+    cam_offset = (cam_offset + 1) % mapwidth
   end
 
   update_leaves()
 end
 
 function _draw()
-  for y = 0, 15 do
-    for x = 0, 15 do
+  for x = 0, 15 do
+    for y = 0, 15 do
       local sprite = modmget(cam_offset + x, y)
+      local leaf = leaf_at(cam_offset + x, y)
 
       if fget(sprite, 5) then
         spr(sprites.path, x * 8, y * 8)
@@ -133,38 +139,23 @@ function _draw()
       else
         spr(sprite, x * 8, y * 8)
       end
-    end
-  end
 
-  for leaf in all(leaves) do
-    local exxes = {
-      (leaf.x - cam_offset) % mapwidth * 8,
-      (leaf.x - cam_offset % mapwidth + mapwidth) % mapwidth * 8
-    }
-
-    for x in all(exxes) do
-      if x >= 0 and x <= 128 then
+      if leaf then
         sspr(
           leaf.sprite.x,
           leaf.sprite.y,
           8,
           8,
-          x,
-          leaf.y * 8,
+          x * 8,
+          y * 8,
           8,
           8,
           leaf.rotation == 90 or leaf.rotation == 270,
           leaf.rotation == 180 or leaf.rotation == 270
         )
       end
-    end
-  end
 
-  for y = 0, 15 do
-    for x = 0, 15 do
-      local sprite = modmget(cam_offset + x, y)
-
-      if player.x - cam_offset == x and player.y == y then
+      if player.x == (cam_offset + x) % mapwidth and player.y == y then
         palt(0, false)
         palt(11, true)
 
@@ -177,6 +168,7 @@ function _draw()
         palt()
       end
 
+      -- sprites that "overhang"
       if fget(sprite, 2) then
         if fget(sprite, 1) and is_gusting(x, y) then
           spr(sprite + 1, x * 8, y * 8)
@@ -187,18 +179,38 @@ function _draw()
     end
   end
 
-  local modx, mody = modxy(player.x, player.y)
-  print(modx .. ", " .. mody)
-  print("cam offset: " .. cam_offset)
-end
-
-function modxy(x, y)
-  return x % mapwidth + 32, y
+  print("cam: " .. cam_offset .. " - p.x: " .. player.x, 0, 0)
 end
 
 function modmget(x, y)
-  local modx, mody = modxy(x, y)
-  return mget(modx, mody)
+  local modx = x % mapwidth + 32
+  return mget(modx, y)
+end
+
+function entity_move(self, dx, dy)
+  self.x = (self.x + dx) % mapwidth
+  self.y += dy
+end
+
+function entity_at(entities, x, y)
+  local modx = x % mapwidth
+
+  for entity in all(entities) do
+    if entity.x == modx and entity.y == y then
+      return entity
+    end
+  end
+
+  return false
+end
+
+function create_entity(x, y, sprite)
+  return {
+    x = x,
+    y = y,
+    sprite = sprite,
+    move = entity_move
+  }
 end
 
 function sample(array)
@@ -228,13 +240,11 @@ function update_leaves()
 end
 
 function leaf_can_move_to(x, y)
-  if x < 0 then
-    return true
-  elseif fget(modmget(x, y), 3) then
+  if fget(modmget(x, y), 3) then
     return false
   elseif leaf_at(x, y) then
     return false
-  elseif player.x == x and player.y == y then
+  elseif player.x == x % mapwidth and player.y == y then
     return false
   else
     return true
@@ -242,7 +252,11 @@ function leaf_can_move_to(x, y)
 end
 
 function player_can_move_to(x, y)
-  return not fget(modmget(x, y), 3)
+  if y < 0 or y > 15 then
+    return false
+  else
+    return not fget(modmget(x, y), 3)
+  end
 end
 
 function is_gusting(x, y)
@@ -258,20 +272,14 @@ function is_gusting(x, y)
 end
 
 function leaf_at(x, y)
-  for leaf in all(leaves) do
-    if leaf.x == x % mapwidth and leaf.y == y then
-      return true
-    end
-  end
-
-  return false
+  return entity_at(leaves, x, y)
 end
 
 function displace_leaf(x, y, dx, dy)
-  local modx = x % mapwidth
+  local leaf = leaf_at(x, y)
 
-  if not leaf_at(modx, y) then
-    return
+  if not leaf then
+    return false
   end
 
   vectors = {
@@ -286,17 +294,19 @@ function displace_leaf(x, y, dx, dy)
     { 1, 0 }
   }
 
-  for leaf in all(leaves) do
-    if leaf.x == modx and leaf.y == y then
-      for vector in all(vectors) do
-        if leaf_can_move_to(modx + vector[1], y + vector[2]) then
-          leaf.x += vector[1]
-          leaf.y += vector[2]
-          return
-        end
-      end
+  for vector in all(vectors) do
+    if leaf_can_move_to(x + vector[1], y + vector[2]) then
+      leaf:move(vector[1], vector[2])
+      refresh_leaves()
+      return true
     end
   end
+end
+
+function refresh_leaves()
+  -- TODO: delete any leaves that have been pushed off the top or bottom of the map
+  -- generate new random leaves so that total population is equal to a config value
+  -- that replaces leafspawn
 end
 
 __gfx__
