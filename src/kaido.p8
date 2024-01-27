@@ -1,9 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
-
--- kaido - by schoblaska
--- music by gruber <3
+-- kaido, by schoblaska
+-- ♪ by gruber
 
 -- flags
 -- 0: tumbles (like a leaf)
