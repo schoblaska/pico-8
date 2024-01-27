@@ -1,6 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+
 -- kaido, by schoblaska
 -- ♪ by gruber
 
@@ -11,6 +12,16 @@ __lua__
 -- 3: blocks (like a wall)
 -- 4: is grass
 -- 5: is path
+
+-- ideas
+-- print words one letter at a time along the path. credits? a poem?
+-- character sprites with swappable colors for randomish skins
+-- moebius vibe?
+-- coastline along bottom
+-- draw overlapping sprites (like trees) somehow...
+--   maybe sprite has a "grow" flag that renders the sprite above it (recursively
+--   until a non-growing sprite is reached). then, only need to place the bases of the trees
+--   on the map and the draw loop can fill in the overlapping sprites in the right order
 
 function _init()
   -- tweak btnp repeat delay (default: 4)
