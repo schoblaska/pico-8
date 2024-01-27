@@ -16,6 +16,9 @@ __lua__
 -- 6: gusts (like wind)
 
 function _init()
+  -- tweak btnp repeat delay
+  poke(0x5f5d, 10)
+
   mapwidth = 48
 
   sprites = {
