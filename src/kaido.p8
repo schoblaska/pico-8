@@ -16,7 +16,7 @@ __lua__
 -- ideas
 -- print words one letter at a time along the path. credits? a poem?
 -- character sprites with swappable colors for randomish skins
--- moebius vibe?
+-- moebius vibe? https://sal-bucket-1.s3.amazonaws.com/wp-content/uploads/2020/08/30143525/Jean-Giraud2-2048x1464.jpg
 -- coastline along bottom
 -- draw overlapping sprites (like trees) somehow...
 --   maybe sprite has a "grow" flag that renders the sprite above it (recursively
