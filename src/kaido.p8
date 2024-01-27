@@ -109,11 +109,9 @@ function _update60()
     displace_leaf(player.x, player.y, 0, 1)
   end
 
-  mcam_offset = cam_offset > player.x and cam_offset - mapwidth or cam_offset
-
-  if mcam_offset + 5 > player.x then
+  if mcam_offset() + 5 > player.x then
     cam_offset = (cam_offset - 1) % mapwidth
-  elseif mcam_offset + 10 < player.x then
+  elseif mcam_offset() + 10 < player.x then
     cam_offset = (cam_offset + 1) % mapwidth
   end
 
@@ -178,8 +176,6 @@ function _draw()
       end
     end
   end
-
-  print("cam: " .. cam_offset .. " - p.x: " .. player.x, 0, 0)
 end
 
 function modmget(x, y)
@@ -259,6 +255,14 @@ function player_can_move_to(x, y)
   end
 end
 
+-- the camera offset is always left of the player
+-- if cam_offset is greater than player.x, it means that the offset
+-- has "looped" around the map but the player has not
+-- subtracting mapwidth from cam_offset makes comparison possible
+function mcam_offset()
+  return cam_offset > player.x and cam_offset - mapwidth or cam_offset
+end
+
 function is_gusting(x, y)
   for gust in all(gusts) do
     local mapx = gust.mapx * 16 + (gust.offset + x) % 16
@@ -282,17 +286,15 @@ function displace_leaf(x, y, dx, dy)
     return false
   end
 
-  vectors = {
-    { dx, dy },
-    { -1, -1 },
-    { -1, 1 },
-    { 0, -1 },
-    { 0, 1 },
-    { 1, -1 },
-    { 1, 1 },
-    { -1, 0 },
-    { 1, 0 }
-  }
+  if dx == 0 and dy == 1 then
+    vectors = { { dx, dy }, { -1, 1 }, { 1, 1 }, { -1, 0 }, { 1, 0 } }
+  elseif dx == 0 and dy == -1 then
+    vectors = { { dx, dy }, { -1, -1 }, { 1, -1 }, { -1, 0 }, { 1, 0 } }
+  elseif dx == 1 and dy == 0 then
+    vectors = { { dx, dy }, { 1, -1 }, { 1, 1 }, { 0, -1 }, { 0, 1 } }
+  elseif dx == -1 and dy == 0 then
+    vectors = { { dx, dy }, { -1, -1 }, { -1, 1 }, { 0, -1 }, { 0, 1 } }
+  end
 
   for vector in all(vectors) do
     if leaf_can_move_to(x + vector[1], y + vector[2]) then
