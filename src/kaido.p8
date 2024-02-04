@@ -321,6 +321,7 @@ end
 function is_gusting(x, y)
   for gust in all(gusts) do
     -- TODO: bug here? I see leaves blowing and spinning when the grass is not moving...
+    --       ah... in some places I'm passing in screen x, y, in others I'm passing in global x, y
     local mgustx = gust.x > x and gust.x - conf.mapwidth or gust.x
 
     if x >= mgustx and x <= mgustx + 16 then
