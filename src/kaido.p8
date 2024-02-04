@@ -28,7 +28,7 @@ function _init()
   poke(0x5f5d, 10)
 
   conf = {
-    mapwidth = 64,
+    mapwidth = 224,
     grassfill = 20,
     pathfill = 20
   }
@@ -56,7 +56,7 @@ function _init()
   -- higher = slower wind
   windspeed = 50
   -- higher = fewer leaves
-  leafspawn = 150
+  leafspawn = 500
   -- higher = slower
   leafrot = 50
   -- higher = slower
@@ -221,14 +221,29 @@ function fill_map()
   end
 end
 
+function modxy(x, y)
+  local modx = x % conf.mapwidth
+  local mody = 0
+
+  if modx > 95 then
+    modx -= 96
+    mody = y + 16
+  else
+    modx += 32
+    mody = y
+  end
+
+  return modx, mody
+end
+
 function modmget(x, y)
-  local modx = x % conf.mapwidth + 32
-  return mget(modx, y)
+  local modx, mody = modxy(x, y)
+  return mget(modx, mody)
 end
 
 function modmset(x, y, sprite)
-  local modx = x % conf.mapwidth + 32
-  return mset(modx, y, sprite)
+  local modx, mody = modxy(x, y)
+  return mset(modx, mody, sprite)
 end
 
 function entity_move(self, dx, dy)
