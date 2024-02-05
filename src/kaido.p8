@@ -156,7 +156,7 @@ function _draw()
 
       -- draw map sprite
       local flip_path_edge = fget(sprite, 5) and not fget(modmget(truex, y + 1), 5)
-      local sway_offset = fget(sprite, 1) and is_gusting(x, y) and 1 or 0
+      local sway_offset = fget(sprite, 1) and is_gusting(truex, y) and 1 or 0
       spr(sprite + sway_offset, x * 8, y * 8, 1, 1, false, flip_path_edge)
 
       -- draw leaf
@@ -180,7 +180,7 @@ function _draw()
         palt(0, false)
         palt(11, true)
 
-        if is_gusting(x, y) then
+        if is_gusting(truex, y) then
           local offset = player.flip and 2 or 1
           spr(sprites.player + offset, x * 8, y * 8, 1, 1, player.flip)
         else
@@ -320,8 +320,6 @@ end
 
 function is_gusting(x, y)
   for gust in all(gusts) do
-    -- TODO: bug here? I see leaves blowing and spinning when the grass is not moving...
-    --       ah... in some places I'm passing in screen x, y, in others I'm passing in global x, y
     local mgustx = gust.x > x and gust.x - conf.mapwidth or gust.x
 
     if x >= mgustx and x <= mgustx + 16 then
