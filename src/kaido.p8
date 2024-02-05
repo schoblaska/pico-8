@@ -74,6 +74,7 @@ function _init()
 
   gusts = {}
   leaves = {}
+  leaf_index = {}
 
   -- TODO: make more dynamic? gusts can change speed, die out, new gusts can start
   for n = 1, flr(conf.mapwidth / 16) do
@@ -90,12 +91,18 @@ function _init()
             y = y,
             sprite = sprites.leaves[flr(rnd(#sprites.leaves)) + 1],
             rotation = sample({ 0, 90, 180, 270 }),
-            move = entity_move
+            move = function(self, dx, dy)
+              entity_move(self, dx, dy)
+              index_leaves()
+              refresh_leaves()
+            end
           }
         )
       end
     end
   end
+
+  index_leaves()
 
   music(39)
 end
@@ -146,7 +153,7 @@ function _draw()
     for y = 0, 15 do
       local truex = cam_offset + x
       local sprite = modmget(truex, y)
-      local leaf = leaf_at(truex, y) -- this lookup is ~50% of cpu usage
+      local leaf = leaf_at(truex, y)
 
       spr(sprites.grass, x * 8, y * 8)
 
@@ -335,7 +342,9 @@ function is_gusting(x, y)
 end
 
 function leaf_at(x, y)
-  return entity_at(leaves, x, y)
+  local modx = x % conf.mapwidth
+  return leaf_index[modx .. "," .. y]
+  -- return entity_at(leaves, x, y)
 end
 
 function displace_leaf(x, y, dx, dy)
@@ -358,7 +367,6 @@ function displace_leaf(x, y, dx, dy)
   for vector in all(vectors) do
     if leaf_can_move_to(x + vector[1], y + vector[2]) then
       leaf:move(vector[1], vector[2])
-      refresh_leaves()
       return true
     end
   end
@@ -368,6 +376,13 @@ function refresh_leaves()
   -- TODO: delete any leaves that have been pushed off the top or bottom of the map
   -- generate new random leaves so that total population is equal to a config value
   -- that replaces leafspawn
+end
+
+function index_leaves()
+  leaf_index = {}
+  for leaf in all(leaves) do
+    leaf_index[leaf.x .. "," .. leaf.y] = leaf
+  end
 end
 
 __gfx__
