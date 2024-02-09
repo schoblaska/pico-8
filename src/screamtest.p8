@@ -6,14 +6,13 @@ __lua__
 -- schoblaska
 
 function _init()
-  anim_speed = 30
-
   player = {
     x = 6,
     y = 8,
     sprites = { 17, 18, 19 },
     frame = 0,
-    flip = false
+    flip = false,
+    anim_speed = 30
   }
 
   enemy = {
@@ -21,7 +20,8 @@ function _init()
     y = 7,
     sprites = { 33, 34 },
     frame = 0,
-    flip = false
+    flip = false,
+    anim_speed = 45
   }
 
   entities = { player, enemy }
@@ -81,12 +81,12 @@ function can_move(entity, x, y)
 end
 
 function draw_entity(entity)
-  local sprite = entity.sprites[flr(entity.frame / anim_speed) + 1]
+  local sprite = entity.sprites[flr(entity.frame / entity.anim_speed) + 1]
   spr(sprite, entity.x * 8, entity.y * 8, 1, 1, entity.flip)
 end
 
 function update_entity(entity)
-  if entity.frame >= anim_speed * #entity.sprites - 1 then
+  if entity.frame >= entity.anim_speed * #entity.sprites - 1 then
     entity.frame = 0
   else
     entity.frame += 1
