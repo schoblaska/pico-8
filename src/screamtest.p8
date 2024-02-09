@@ -28,11 +28,17 @@ function _init()
 end
 
 function _update60()
-  if btnp(0) and can_move(player, player.x - 1, player.y) then
-    player.x -= 1
+  if btnp(0) then
+    if can_move(player, player.x - 1, player.y) then
+      player.x -= 1
+    end
+
     player.flip = false
-  elseif btnp(1) and can_move(player, player.x + 1, player.y) then
-    player.x += 1
+  elseif btnp(1) then
+    if can_move(player, player.x + 1, player.y) then
+      player.x += 1
+    end
+
     player.flip = true
   elseif btnp(2) and can_move(player, player.x, player.y - 1) then
     player.y -= 1
