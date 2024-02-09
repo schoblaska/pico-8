@@ -6,26 +6,43 @@ __lua__
 -- schoblaska
 
 function _init()
-  anim_speed = 60
+  anim_speed = 30
 
   player = {
     x = 6,
     y = 8,
     sprites = { 17, 18, 19 },
-    frame = 0
+    frame = 0,
+    flip = false
   }
 
   enemy = {
     x = 9,
     y = 7,
     sprites = { 33, 34 },
-    frame = 0
+    frame = 0,
+    flip = false
   }
+
+  entities = { player, enemy }
 end
 
 function _update60()
-  advance_frame(player)
-  advance_frame(enemy)
+  if btnp(0) and can_move(player, player.x - 1, player.y) then
+    player.x -= 1
+    player.flip = false
+  elseif btnp(1) and can_move(player, player.x + 1, player.y) then
+    player.x += 1
+    player.flip = true
+  elseif btnp(2) and can_move(player, player.x, player.y - 1) then
+    player.y -= 1
+  elseif btnp(3) and can_move(player, player.x, player.y + 1) then
+    player.y += 1
+  end
+
+  for entity in all(entities) do
+    update_entity(entity)
+  end
 end
 
 function _draw()
@@ -36,16 +53,33 @@ function _draw()
     end
   end
 
-  draw_entity(player)
-  draw_entity(enemy)
+  for entity in all(entities) do
+    draw_entity(entity)
+  end
+end
+
+function can_move(entity, x, y)
+  local msprite = mget(x, y)
+
+  if fget(msprite, 0) then
+    return false
+  end
+
+  for entity in all(entities) do
+    if entity.x == x and entity.y == y then
+      return false
+    end
+  end
+
+  return true
 end
 
 function draw_entity(entity)
-  sprite = entity.sprites[flr(entity.frame / anim_speed) + 1]
-  spr(sprite, entity.x * 8, entity.y * 8)
+  local sprite = entity.sprites[flr(entity.frame / anim_speed) + 1]
+  spr(sprite, entity.x * 8, entity.y * 8, 1, 1, entity.flip)
 end
 
-function advance_frame(entity)
+function update_entity(entity)
   if entity.frame >= anim_speed * #entity.sprites - 1 then
     entity.frame = 0
   else
