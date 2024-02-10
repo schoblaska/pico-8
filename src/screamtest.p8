@@ -7,8 +7,9 @@ __lua__
 
 function _init()
   player = {
-    x = 6,
-    y = 8,
+    x = 6, y = 8,
+    moving_to = { x = 6, y = 8 },
+    progress = 8,
     sprites = { 17, 18, 19 },
     frame = 0,
     flip = false,
@@ -16,35 +17,22 @@ function _init()
   }
 
   enemy = {
-    x = 9,
-    y = 7,
+    x = 9, y = 7,
+    moving_to = { x = 9, y = 7 },
+    progress = 8,
     sprites = { 33, 34 },
     frame = 0,
     flip = false,
-    anim_speed = 45
+    anim_speed = 40
   }
 
   entities = { player, enemy }
+  enemy_speed = 0.25
+  update_func = wait_for_player_input
 end
 
 function _update60()
-  if btnp(0) then
-    if can_move(player, player.x - 1, player.y) then
-      player.x -= 1
-    end
-
-    player.flip = false
-  elseif btnp(1) then
-    if can_move(player, player.x + 1, player.y) then
-      player.x += 1
-    end
-
-    player.flip = true
-  elseif btnp(2) and can_move(player, player.x, player.y - 1) then
-    player.y -= 1
-  elseif btnp(3) and can_move(player, player.x, player.y + 1) then
-    player.y += 1
-  end
+  update_func()
 
   for entity in all(entities) do
     update_entity(entity)
@@ -64,6 +52,37 @@ function _draw()
   end
 end
 
+function wait_for_player_input()
+  if btnp(0) then
+    if can_move(player, player.x - 1, player.y) then
+      initiate_player_move(player.x - 1, player.y)
+    end
+
+    player.flip = false
+  elseif btnp(1) then
+    if can_move(player, player.x + 1, player.y) then
+      initiate_player_move(player.x + 1, player.y)
+    end
+
+    player.flip = true
+  elseif btnp(2) and can_move(player, player.x, player.y - 1) then
+    initiate_player_move(player.x, player.y - 1)
+  elseif btnp(3) and can_move(player, player.x, player.y + 1) then
+    initiate_player_move(player.x, player.y + 1)
+  end
+end
+
+function perform_player_movement()
+  if player.progress < 6 then
+    player.progress += 2
+  else
+    player.x = player.moving_to.x
+    player.y = player.moving_to.y
+    player.progress = 8
+    update_func = wait_for_player_input
+  end
+end
+
 function can_move(entity, x, y)
   local msprite = mget(x, y)
 
@@ -80,9 +99,19 @@ function can_move(entity, x, y)
   return true
 end
 
+function initiate_player_move(x, y)
+  player.moving_to = { x = x, y = y }
+  player.progress = 1
+  update_func = perform_player_movement
+end
+
 function draw_entity(entity)
   local sprite = entity.sprites[flr(entity.frame / entity.anim_speed) + 1]
-  spr(sprite, entity.x * 8, entity.y * 8, 1, 1, entity.flip)
+
+  local offset_x = (entity.moving_to.x - entity.x) * entity.progress
+  local offset_y = (entity.moving_to.y - entity.y) * entity.progress
+
+  spr(sprite, entity.x * 8 + offset_x, entity.y * 8 + offset_y, 1, 1, entity.flip)
 end
 
 function update_entity(entity)
@@ -91,6 +120,13 @@ function update_entity(entity)
   else
     entity.frame += 1
   end
+
+  -- if entity ~= player and entity.x == entity.moving_to.x then
+  --   if can_move(entity, entity.x - 1, entity.y) then
+  --     entity.moving_to = { x = x, y = y }
+  --     entity.progress = 1
+  --   end
+  -- end
 end
 
 __gfx__
