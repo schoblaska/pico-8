@@ -27,7 +27,7 @@ function _init()
   }
 
   entities = { player, enemy }
-  enemy_speed = 0.25
+  enemy_speed = 0.1
   update_func = wait_for_player_input
 end
 
@@ -37,6 +37,8 @@ function _update60()
   for entity in all(entities) do
     update_entity(entity)
   end
+
+  perform_enemy_movements()
 end
 
 function _draw()
@@ -83,6 +85,20 @@ function perform_player_movement()
   end
 end
 
+function perform_enemy_movements()
+  for entity in all(entities) do
+    if entity ~= player then
+      if entity.progress < 8 - enemy_speed then
+        entity.progress += enemy_speed
+      else
+        entity.x = entity.moving_to.x
+        entity.y = entity.moving_to.y
+        entity.progress = 8
+      end
+    end
+  end
+end
+
 function can_move(entity, x, y)
   local msprite = mget(x, y)
 
@@ -121,12 +137,12 @@ function update_entity(entity)
     entity.frame += 1
   end
 
-  -- if entity ~= player and entity.x == entity.moving_to.x then
-  --   if can_move(entity, entity.x - 1, entity.y) then
-  --     entity.moving_to = { x = x, y = y }
-  --     entity.progress = 1
-  --   end
-  -- end
+  if entity ~= player and entity.x == entity.moving_to.x then
+    if can_move(entity, entity.x - 1, entity.y) then
+      entity.moving_to = { x = entity.x - 1, y = entity.y }
+      entity.progress = enemy_speed
+    end
+  end
 end
 
 __gfx__
