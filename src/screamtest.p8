@@ -8,26 +8,25 @@ __lua__
 function _init()
   player = {
     x = 6, y = 8,
-    moving_to = { x = 6, y = 8 },
-    progress = 8,
+    offset = { x = 0, y = 0 },
+    idle = 0,
     sprites = { 17, 18, 19 },
     frame = 0,
-    flip = false,
-    anim_speed = 30
+    anim_speed = 30,
+    flip = false
   }
 
   enemy = {
     x = 9, y = 7,
-    moving_to = { x = 9, y = 7 },
-    progress = 8,
+    offset = { x = 0, y = 0 },
+    idle = 0,
     sprites = { 33, 34 },
     frame = 0,
-    flip = false,
-    anim_speed = 40
+    anim_speed = 45,
+    flip = false
   }
 
   entities = { player, enemy }
-  enemy_speed = 0.1
   update_func = wait_for_player_input
 end
 
@@ -37,8 +36,6 @@ function _update60()
   for entity in all(entities) do
     update_entity(entity)
   end
-
-  perform_enemy_movements()
 end
 
 function _draw()
@@ -57,45 +54,27 @@ end
 function wait_for_player_input()
   if btnp(0) then
     if can_move(player, player.x - 1, player.y) then
-      initiate_player_move(player.x - 1, player.y)
+      move_player(player.x - 1, player.y)
     end
 
     player.flip = false
   elseif btnp(1) then
     if can_move(player, player.x + 1, player.y) then
-      initiate_player_move(player.x + 1, player.y)
+      move_player(player.x + 1, player.y)
     end
 
     player.flip = true
   elseif btnp(2) and can_move(player, player.x, player.y - 1) then
-    initiate_player_move(player.x, player.y - 1)
+    move_player(player.x, player.y - 1)
   elseif btnp(3) and can_move(player, player.x, player.y + 1) then
-    initiate_player_move(player.x, player.y + 1)
+    move_player(player.x, player.y + 1)
   end
 end
 
-function perform_player_movement()
-  if player.progress < 6 then
-    player.progress += 2
-  else
-    player.x = player.moving_to.x
-    player.y = player.moving_to.y
-    player.progress = 8
+function wait_for_player_movement()
+  if player.offset.x == 0 and player.offset.y == 0 then
     update_func = wait_for_player_input
-  end
-end
-
-function perform_enemy_movements()
-  for entity in all(entities) do
-    if entity ~= player then
-      if entity.progress < 8 - enemy_speed then
-        entity.progress += enemy_speed
-      else
-        entity.x = entity.moving_to.x
-        entity.y = entity.moving_to.y
-        entity.progress = 8
-      end
-    end
+    player.idle = 0
   end
 end
 
@@ -115,19 +94,36 @@ function can_move(entity, x, y)
   return true
 end
 
-function initiate_player_move(x, y)
-  player.moving_to = { x = x, y = y }
-  player.progress = 1
-  update_func = perform_player_movement
+function move_player(x, y)
+  move_entity(player, x, y)
+  update_func = wait_for_player_movement
+end
+
+function move_entity(entity, x, y)
+  local dx = entity.x - x
+  local dy = entity.y - y
+
+  entity.x = x
+  entity.y = y
+  entity.offset.x = dx * 8
+  entity.offset.y = dy * 8
+  entity.idle = 0
+
+  if dx ~= 0 then
+    entity.flip = dx < 0
+  end
 end
 
 function draw_entity(entity)
   local sprite = entity.sprites[flr(entity.frame / entity.anim_speed) + 1]
 
-  local offset_x = (entity.moving_to.x - entity.x) * entity.progress
-  local offset_y = (entity.moving_to.y - entity.y) * entity.progress
-
-  spr(sprite, entity.x * 8 + offset_x, entity.y * 8 + offset_y, 1, 1, entity.flip)
+  spr(
+    sprite,
+    entity.x * 8 + entity.offset.x,
+    entity.y * 8 + entity.offset.y,
+    1, 1,
+    entity.flip
+  )
 end
 
 function update_entity(entity)
@@ -137,26 +133,27 @@ function update_entity(entity)
     entity.frame += 1
   end
 
-  if entity ~= player and entity.x == entity.moving_to.x and entity.y == entity.moving_to.y then
+  if entity.offset.x ~= 0 then
+    entity.offset.x += 2 * -sgn(entity.offset.x)
+  end
+
+  if entity.offset.y ~= 0 then
+    entity.offset.y += 2 * -sgn(entity.offset.y)
+  end
+
+  entity.idle += 1
+
+  if entity ~= player and entity.offset.x == 0 and entity.offset.y == 0 and entity.idle > 100 then
     local dirs = {
-      { -1, 0 },
-      { 1, 0 },
-      { 0, 1 },
-      { 0, -1 }
+      { -1, 0 }, { 1, 0 },
+      { 0, 1 }, { 0, -1 }
     }
 
     local dir = dirs[flr(rnd(4) + 1)]
     local newx, newy = dir[1] + entity.x, dir[2] + entity.y
 
     if can_move(entity, newx, newy) then
-      entity.moving_to = { x = newx, y = newy }
-      entity.progress = enemy_speed
-
-      if newx > entity.x then
-        entity.flip = true
-      elseif newx < entity.x then
-        entity.flip = false
-      end
+      move_entity(entity, newx, newy)
     end
   end
 end
