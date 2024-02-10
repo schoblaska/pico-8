@@ -137,10 +137,26 @@ function update_entity(entity)
     entity.frame += 1
   end
 
-  if entity ~= player and entity.x == entity.moving_to.x then
-    if can_move(entity, entity.x - 1, entity.y) then
-      entity.moving_to = { x = entity.x - 1, y = entity.y }
+  if entity ~= player and entity.x == entity.moving_to.x and entity.y == entity.moving_to.y then
+    local dirs = {
+      { -1, 0 },
+      { 1, 0 },
+      { 0, 1 },
+      { 0, -1 }
+    }
+
+    local dir = dirs[flr(rnd(4) + 1)]
+    local newx, newy = dir[1] + entity.x, dir[2] + entity.y
+
+    if can_move(entity, newx, newy) then
+      entity.moving_to = { x = newx, y = newy }
       entity.progress = enemy_speed
+
+      if newx > entity.x then
+        entity.flip = true
+      elseif newx < entity.x then
+        entity.flip = false
+      end
     end
   end
 end
