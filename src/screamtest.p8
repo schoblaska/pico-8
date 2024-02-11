@@ -65,17 +65,28 @@ function _init()
       if should_act(self, player_moved) then
         if self.red then
           local dirs = {
-            { -1, 0 }, { 1, 0 },
-            { 0, 1 }, { 0, -1 }
+            { -1, 0, dist(self.x - 1, self.y, player.x, player.y) },
+            { 1, 0, dist(self.x + 1, self.y, player.x, player.y) },
+            { 0, 1, dist(self.x, self.y + 1, player.x, player.y) },
+            { 0, -1, dist(self.x, self.y - 1, player.x, player.y) }
           }
+          for i = 1, #dirs do
+            for j = i + 1, #dirs do
+              if dirs[j][3] < dirs[i][3] then
+                dirs[i], dirs[j] = dirs[j], dirs[i]
+              end
+            end
+          end
 
-          local dir = dirs[flr(rnd(4) + 1)]
-          local newx, newy = dir[1] + self.x, dir[2] + self.y
+          for dir in all(dirs) do
+            local newx, newy = dir[1] + self.x, dir[2] + self.y
 
-          if can_move(self, newx, newy) then
-            move_entity(self, newx, newy)
-            self.red = false
-            self.sprites = self.normal_sprites
+            if can_move(self, newx, newy) then
+              move_entity(self, newx, newy)
+              self.red = false
+              self.sprites = self.normal_sprites
+              return
+            end
           end
         else
           self.red = true
@@ -243,6 +254,11 @@ end
 
 function sample(array)
   return array[flr(rnd(#array)) + 1]
+end
+
+function dist(ax, ay, bx, by)
+  local dx, dy = ax - bx, ay - by
+  return sqrt(dx * dx + dy * dy)
 end
 
 __gfx__
