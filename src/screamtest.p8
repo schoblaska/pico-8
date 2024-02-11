@@ -2,9 +2,6 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 
--- scream test
--- schoblaska
-
 function _init()
   floorfill = {
     176, 177, 178, 179, 163,
@@ -14,6 +11,17 @@ function _init()
     147, 148, 149,
     147, 148, 149
   }
+
+  lightmap = {}
+
+  for i = 1, 16 do
+    lightmap[i] = {}
+    for j = 1, 16 do
+      lightmap[i][j] = 0
+    end
+  end
+
+  show_lightmap = false
 
   player = {
     x = 6, y = 8,
@@ -43,7 +51,7 @@ function _init()
         local dir = dirs[flr(rnd(4) + 1)]
         local newx, newy = dir[1] + self.x, dir[2] + self.y
 
-        if can_move(self, newx, newy) then
+        if open_space(newx, newy) then
           move_entity(self, newx, newy)
         end
       end
@@ -70,6 +78,8 @@ function _init()
             { 0, 1, dist(self.x, self.y + 1, player.x, player.y) },
             { 0, -1, dist(self.x, self.y - 1, player.x, player.y) }
           }
+
+          -- sort based on distance to player
           for i = 1, #dirs do
             for j = i + 1, #dirs do
               if dirs[j][3] < dirs[i][3] then
@@ -81,7 +91,7 @@ function _init()
           for dir in all(dirs) do
             local newx, newy = dir[1] + self.x, dir[2] + self.y
 
-            if can_move(self, newx, newy) then
+            if open_space(newx, newy) then
               move_entity(self, newx, newy)
               self.red = false
               self.sprites = self.normal_sprites
@@ -106,11 +116,18 @@ function _init()
       end
     end
   end
+
+  update_lightmap()
 end
 
 function _update60()
   update_func()
   update_player()
+
+  -- for debugging; always listen for this input
+  if btnp(5) then
+    show_lightmap = not show_lightmap
+  end
 
   for enemy in all(enemies) do
     update_enemy(enemy)
@@ -119,12 +136,14 @@ end
 
 function _draw()
   palt(0, false)
+
   for x = 0, 15 do
     for y = 0, 15 do
       local sprite = mget(x, y)
       spr(sprite, x * 8, y * 8)
     end
   end
+
   palt()
 
   draw_entity(player)
@@ -132,24 +151,33 @@ function _draw()
   for enemy in all(enemies) do
     draw_entity(enemy)
   end
+
+  if show_lightmap then
+    for x = 0, 15 do
+      for y = 0, 15 do
+        local l = lightmap[x + 1][y + 1]
+        print(l, x * 8 + 2, y * 8 + 2, 12)
+      end
+    end
+  end
 end
 
 function wait_for_player_input()
   if btnp(0) then
-    if can_move(player, player.x - 1, player.y) then
+    if open_space(player.x - 1, player.y) then
       move_player(player.x - 1, player.y)
     end
 
     player.flip = false
   elseif btnp(1) then
-    if can_move(player, player.x + 1, player.y) then
+    if open_space(player.x + 1, player.y) then
       move_player(player.x + 1, player.y)
     end
 
     player.flip = true
-  elseif btnp(2) and can_move(player, player.x, player.y - 1) then
+  elseif btnp(2) and open_space(player.x, player.y - 1) then
     move_player(player.x, player.y - 1)
-  elseif btnp(3) and can_move(player, player.x, player.y + 1) then
+  elseif btnp(3) and open_space(player.x, player.y + 1) then
     move_player(player.x, player.y + 1)
   end
 end
@@ -161,7 +189,7 @@ function wait_for_player_movement()
   end
 end
 
-function can_move(entity, x, y)
+function open_space(x, y)
   local msprite = mget(x, y)
 
   if fget(msprite, 0) then
@@ -188,6 +216,7 @@ function move_player(x, y)
     enemy:act(true)
   end
 
+  update_lightmap()
   update_func = wait_for_player_movement
 end
 
@@ -221,6 +250,45 @@ end
 function update_player()
   update_animations(player)
   player.idle += 1
+end
+
+function update_lightmap()
+  -- lightmap is a 16 x 16 array containing the illumination value of each x, y coordinate
+  -- the player x, y is brightness 6
+  -- each square you move away from the player, brightness decreases by one level
+  -- walls (flag 0) will block light, but be illuminated themselves
+  -- this function updates the values in lightmap based on current player location
+
+  for x = 0, 15 do
+    for y = 0, 15 do
+      lightmap[x + 1][y + 1] = 0
+    end
+  end
+
+  local queue = { { player.x, player.y, 6 } }
+  local visited = {}
+
+  while #queue > 0 do
+    local node = queue[1]
+    visited[node[1] .. "," .. node[2]] = true
+    del(queue, node)
+
+    local x, y, light = node[1], node[2], node[3]
+
+    if lightmap[x + 1][y + 1] < light then
+      lightmap[x + 1][y + 1] = light
+    end
+
+    if light > 0 then
+      for dir in all({ { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }) do
+        local newx, newy = x + dir[1], y + dir[2]
+
+        if not visited[newx .. "," .. newy] and open_space(newx, newy) then
+          add(queue, { newx, newy, light - 1 })
+        end
+      end
+    end
+  end
 end
 
 function update_enemy(enemy)
@@ -263,21 +331,21 @@ end
 
 __gfx__
 0000000011111111dddddddd0000000006666660066666600eeeeee00eeeeee00000000000000000000000000000000000000000000000000000000000000000
-0000000011111111dddddddd000000006766666661616666eeeeeeeee8e8eeee0000000000000000000000000000000000000000000000000000000000000000
-0070070011111111dddddddd00000000616166c661616c66e8e8eefee8e8efee0000000000000000000000000000000000000000000000000000000000000000
-0007700011111111dddddddd0000000061616c606666c1c0e8e8efe0eeeef1f00000000000000000000000000000000000000000000000000000000000000000
-0007700011111111dddddddd00000000666661c000005050eeeee120000020200000000000000000000000000000000000000000000000000000000000000000
-0070070011111111dddddddd000000000000055ee55000000000022ee22000000000000000000000000000000000000000000000000000000000000000000000
-0000000011111111dddddddd0000000005550ee00ee0555002220ee00ee022200000000000000000000000000000000000000000000000000000000000000000
-0000000011111111dddddddd00000000eeee00000000eeeeeeee00000000eeee0000000000000000000000000000000000000000000000000000000000000000
-0000000000a0a00000a0a00000a0a0000eeeeee00000000008888880000000000000000000000000000000000000000000000000000000000000000000000000
-000000000bbbbba00bbbbba00bbbbba0ee1e1eeb000000008828288e000000000000000000000000000000000000000000000000000000000000000000000000
-00000000b1b1bbb0b1b1bbb0b1b1bbb0be1e1ebe0eeeeee0e82828e2000000000000000000000000000000000000000000000000000000000000000000000000
-00000000b1b1bbbab1b1bbbab1b1bbea0eeeeee0ee1e1eee08888880088888800000000000000000000000000000000000000000000000000000000000000000
-00000000bbbbb1b0bbbbb1b0bbbbbeb070000000ee1e1ebe70000000882828880000000000000000000000000000000000000000000000000000000000000000
-0000000001111beb01111ebb01111bbb07777770beeeeeeb07777770882828e80000000000000000000000000000000000000000000000000000000000000000
-00000000b777bbbbe777bbbbe77ebbbb70000000b000000070000000e888888e0000000000000000000000000000000000000000000000000000000000000000
-00000000ee7eebb0e7eebbb0be77ebb0077777700777777007777770e77777700000000000000000000000000000000000000000000000000000000000000000
+0000000011111111dddddddd000000006766666661616666eeeeeeeee8e8eeee1111100000000000000000000000000000000000000000000000000000000000
+0070070011111111dddddddd00000000616166c661616c66e8e8eefee8e8efee2211100000000000000000000000000000000000000000000000000000000000
+0007700011111111dddddddd0000000061616c606666c1c0e8e8efe0eeeef1f03331100000000000000000000000000000000000000000000000000000000000
+0007700011111111dddddddd00000000666661c000005050eeeee120000020204221100000000000000000000000000000000000000000000000000000000000
+0070070011111111dddddddd000000000000055ee55000000000022ee22000005511100000000000000000000000000000000000000000000000000000000000
+0000000011111111dddddddd0000000005550ee00ee0555002220ee00ee0222066d5100000000000000000000000000000000000000000000000000000000000
+0000000011111111dddddddd00000000eeee00000000eeeeeeee00000000eeee776d100000000000000000000000000000000000000000000000000000000000
+0000000000a0a00000a0a00000a0a0000eeeeee00000000008888880000000008888800000000000000000000000000000000000000000000000000000000000
+000000000bbbbba00bbbbba00bbbbba0ee1e1eeb000000008828288e000000009422100000000000000000000000000000000000000000000000000000000000
+00000000b1b1bbb0b1b1bbb0b1b1bbb0be1e1ebe0eeeeee0e82828e200000000a942100000000000000000000000000000000000000000000000000000000000
+00000000b1b1bbbab1b1bbbab1b1bbea0eeeeee0ee1e1eee0888888008888880bb33100000000000000000000000000000000000000000000000000000000000
+00000000bbbbb1b0bbbbb1b0bbbbbeb070000000ee1e1ebe7000000088282888ccd5100000000000000000000000000000000000000000000000000000000000
+0000000001111beb01111ebb01111bbb07777770beeeeeeb07777770882828e8d551100000000000000000000000000000000000000000000000000000000000
+00000000b777bbbbe777bbbbe77ebbbb70000000b000000070000000e888888eee82100000000000000000000000000000000000000000000000000000000000
+00000000ee7eebb0e7eebbb0be77ebb0077777700777777007777770e7777770f942100000000000000000000000000000000000000000000000000000000000
 00000000000777000007770700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000077777770777777700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000722277707222777000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
