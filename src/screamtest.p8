@@ -329,6 +329,29 @@ function dist(ax, ay, bx, by)
   return sqrt(dx * dx + dy * dy)
 end
 
+-- dt_ functions are from Dank Tomb tech demo
+-- https://www.lexaloffle.com/bbs/?tid=28785
+
+function dt_init_blending_tables(nlevels)
+  local blend_table_start_x = 64
+
+  for lv = 1, nlevels do
+    local addr = 0x4300 + lv * 0x100
+    local sx = lv - 1 + blend_table_start_x
+    for c1 = 0, 15 do
+      local nc = sget(sx, c1)
+      local topl = shl(nc, 4)
+      for c2 = 0, 15 do
+        poke(
+          addr,
+          topl + sget(sx, c2)
+        )
+        addr += 1
+      end
+    end
+  end
+end
+
 __gfx__
 0000000011111111dddddddd0000000006666660066666600eeeeee00eeeeee00000000000000000000000000000000000000000000000000000000000000000
 0000000011111111dddddddd000000006766666661616666eeeeeeeee8e8eeee1111100000000000000000000000000000000000000000000000000000000000
