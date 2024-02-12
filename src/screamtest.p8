@@ -269,10 +269,10 @@ end
 function darken_squares()
   palt(0, false)
 
-  for x = 0, 15 do
-    for y = 0, 15 do
+  for x = 0, 31 do
+    for y = 0, 31 do
       if lightmap[x + 1][y + 1] < 2 then
-        spr(3, x * 8, y * 8)
+        spr(3, x * 4, y * 4, 0.5, 0.5)
       end
     end
   end
@@ -281,10 +281,14 @@ function darken_squares()
 end
 
 function update_lightmap()
-  for x = 0, 15 do
-    for y = 0, 15 do
-      if line_of_sight(player.x, player.y, x, y) then
-        lightmap[x + 1][y + 1] = max(0, flr(6 - dist(player.x, player.y, x, y)))
+  for x = 0, 31 do
+    lightmap[x + 1] = {}
+
+    for y = 0, 31 do
+      local gx = flr(x / 2)
+      local gy = flr(y / 2)
+      if line_of_sight(player.x, player.y, gx, gy, x % 2, y % 2) then
+        lightmap[x + 1][y + 1] = max(0, flr(6 - dist(player.x, player.y, gx + 0.5, gy + 0.5)))
       else
         lightmap[x + 1][y + 1] = 0
       end
@@ -292,9 +296,9 @@ function update_lightmap()
   end
 end
 
-function line_of_sight(x1, y1, x2, y2)
-  local dx = x2 - x1
-  local dy = y2 - y1
+function line_of_sight(x1, y1, x2, y2, quadrantX, quadrantY)
+  local dx = x2 - x1 + quadrantX * 0.5
+  local dy = y2 - y1 + quadrantY * 0.5
   local steps = max(abs(dx), abs(dy))
   local sx = dx / steps
   local sy = dy / steps
@@ -304,10 +308,14 @@ function line_of_sight(x1, y1, x2, y2)
     x += sx
     y += sy
 
-    local tile = mget(x, y)
+    local tile = mget(flr(x), flr(y))
 
     if fget(tile, 0) then
-      return x == x2 and y == y2
+      if flr(x) == x2 and flr(y) == y2 then
+        return true
+      else
+        return false
+      end
     end
   end
 
