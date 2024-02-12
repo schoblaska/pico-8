@@ -262,7 +262,6 @@ function darken_squares()
   end
 
   pal()
-  -- palt()
 end
 
 function swap_pal(n)
@@ -296,7 +295,7 @@ function update_lightmap()
 
   for x = losx1, losx2 do
     for y = losy1, losy2 do
-      local has_los = line_of_sight(player.x, player.y, x, y, 0, 0)
+      local has_los = line_of_sight(player.x, player.y, x, y, 1, 1)
 
       if has_los then
         local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
@@ -328,8 +327,9 @@ function update_lightmap()
             local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
             local bri = max(0, flr(6 - pdist))
 
-            lightmap[x + 1][y + 1] = bri
-            maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
+            -- TODO: this only works well on a 32 x 32 light grid
+            -- lightmap[x + 1][y + 1] = bri
+            -- maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
           end
         end
       end
