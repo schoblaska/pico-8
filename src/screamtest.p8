@@ -14,13 +14,6 @@ function _init()
 
   lightmap = {}
 
-  for i = 1, 16 do
-    lightmap[i] = {}
-    for j = 1, 16 do
-      lightmap[i][j] = 0
-    end
-  end
-
   player = {
     x = 6, y = 8,
     offset = { x = 0, y = 0 },
@@ -242,10 +235,10 @@ end
 function darken_squares()
   palt(0, false)
 
-  for x = 0, 31 do
-    for y = 0, 31 do
+  for x = 0, 15 do
+    for y = 0, 15 do
       if lightmap[x + 1][y + 1] < 3 then
-        spr(3, x * 4, y * 4, 0.5, 0.5)
+        spr(3, x * 8, y * 8)
       end
     end
   end
@@ -254,15 +247,19 @@ function darken_squares()
 end
 
 function update_lightmap()
-  for x = 0, 31 do
-    lightmap[x + 1] = {}
+  local losx1, losx2 = max(0, player.x - 7), min(15, player.x + 7)
+  local losy1, losy2 = max(0, player.y - 7), min(15, player.y + 7)
 
-    for y = 0, 31 do
-      local gx = flr(x / 2)
-      local gy = flr(y / 2)
-      local pdist = dist(player.x, player.y, gx + 0.5, gy + 0.5)
+  for x = 0, 15 do
+    lightmap[x + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  end
 
-      if pdist < 7 and line_of_sight(player.x, player.y, gx, gy, x % 2, y % 2) then
+  for x = losx1, losx2 do
+    for y = losy1, losy2 do
+      local has_los = line_of_sight(player.x, player.y, x, y, 0, 0)
+
+      if has_los then
+        local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
         lightmap[x + 1][y + 1] = max(0, flr(6 - pdist))
       else
         lightmap[x + 1][y + 1] = 0
@@ -272,23 +269,22 @@ function update_lightmap()
 
   -- for all wall blocks, if they are adjacent to an illuminated floor block
   -- they should be illuminated as well
-  for x = 0, 31 do
-    for y = 0, 31 do
-      local is_wall = fget(mget(x / 2, y / 2), 0)
-      local pdist = dist(player.x, player.y, flr(x / 2) + 0.5, flr(y / 2) + 0.5)
+  for x = losx1, losx2 do
+    for y = losy1, losy2 do
+      local is_wall = fget(mget(x, y), 0)
 
-      if pdist < 7 and is_wall then
-        for dx = -1, 1 do
-          for dy = -1, 1 do
-            local gx = x + dx
-            local gy = y + dy
-            local is_floor = not fget(mget(gx / 2, gy / 2), 0)
-            local is_in_bounds = gx >= 0 and gx < 32 and gy >= 0 and gy < 32
+      -- TODO: pre-compute wall subblocks and neighboring floor subblocks
+      for dx = -1, 1 do
+        for dy = -1, 1 do
+          local fx = x + dx
+          local fy = y + dy
+          local is_floor = not fget(mget(fx, fy), 0)
+          local is_in_bounds = fx >= 0 and fx <= 15 and fy >= 0 and fy <= 15
 
-            if is_floor and is_in_bounds and lightmap[gx + 1][gy + 1] > 0 then
-              local bri = max(0, flr(6 - pdist))
-              lightmap[x + 1][y + 1] = bri
-            end
+          if is_floor and is_in_bounds and lightmap[fx + 1][fy + 1] > 0 then
+            local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
+            local bri = max(0, flr(6 - pdist))
+            lightmap[x + 1][y + 1] = bri
           end
         end
       end
