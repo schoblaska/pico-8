@@ -2,6 +2,29 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 
+-- some ideas for this engine
+--
+-- maybe a 32x32 grid would be better
+-- but still calculate a 16x16 light grid for tile visibility
+-- 32x32 does better for illuminating walls of adjacent tiles
+--
+-- better wall highlighting
+-- walls should take the _lesser_ of 1) their brightness as calculated by
+-- distance to player, and 2) the brightest adjoining floor tile. this way, a
+-- "close" side of a wall won't be brighter than the floor tile causing it to
+-- be visible
+--
+-- it'd be cool to get actual dynamic lighting working
+-- still grid-based, but do the peek / poke screen memory trick to actually
+-- darken each square dynamically. this way enemies get the full range of
+-- shadows as well
+--
+-- other light sources
+-- if a lamp or something is on the wall, the player should be able to see any
+-- tiles it illuminates as long as the player has line of sight to those tiles.
+-- i.e., even if they are too far away for a player to normally see, an
+-- illuminated tile that the player has LOS to will always be visible
+
 function _init()
   floorfill = {
     176, 177, 178, 179, 163,
