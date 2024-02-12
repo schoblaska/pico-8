@@ -160,6 +160,7 @@ function _draw()
       end
     end
   end
+  darken_squares()
 end
 
 function wait_for_player_input()
@@ -250,6 +251,20 @@ end
 function update_player()
   update_animations(player)
   player.idle += 1
+end
+
+function darken_squares()
+  palt(0, false)
+
+  for x = 0, 15 do
+    for y = 0, 15 do
+      if lightmap[x + 1][y + 1] < 2 then
+        spr(3, x * 8, y * 8)
+      end
+    end
+  end
+
+  palt()
 end
 
 function update_lightmap()
