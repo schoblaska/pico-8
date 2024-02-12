@@ -3,6 +3,8 @@ version 41
 __lua__
 
 function _init()
+  dt_init_blending_tables(6)
+
   floorfill = {
     176, 177, 178, 179, 163,
     147, 148, 149,
@@ -10,6 +12,15 @@ function _init()
     147, 148, 149,
     147, 148, 149,
     147, 148, 149
+  }
+
+  fl_blends = {
+    dt_fl_blend(1),
+    dt_fl_blend(2),
+    dt_fl_blend(3),
+    dt_fl_blend(4),
+    dt_fl_blend(5),
+    dt_fl_blend(6)
   }
 
   lightmap = {}
@@ -160,6 +171,8 @@ function _draw()
       end
     end
   end
+
+  -- apply_lighting()
   darken_squares()
 end
 
@@ -341,6 +354,53 @@ function dist(ax, ay, bx, by)
   return sqrt(dx * dx + dy * dy)
 end
 
+function apply_lighting()
+  -- loop through each address in screen memory
+  -- look up the light level of the corresponding grid tile (in lightmap)
+  -- then use the appropriate blending tile to replace the colors
+  -- eg:
+  --
+  -- for screenaddr=start,end do
+  --   poke(screenaddr,
+  --     peek(bor(lutaddr,peek(screenaddr)))
+  --   )
+  -- end
+  --
+  -- from the PICO-8 manual entry on screen memory:
+  --
+  -- Screen data
+  -- This 8,192-byte (8 KiB) region contains the graphics buffer. This is what is
+  -- modified by the built-in drawing functions, and is what is copied to the
+  -- actual display at the end of the game loop or by a call to flip().
+  --
+  -- 0x6000..0x7fff / 24576..32767
+  --
+  -- All 128 rows of the screen, top to bottom. Each row contains 128 pixels in
+  -- 64 bytes. Each byte contains two adjacent pixels, with the low 4 bits being
+  -- the left/even pixel and the high 4 bits being the right/odd pixel.
+  --
+  -- This is essentially the same format as the sprite sheet at 0x0000..0x1fff
+  -- (see above). As a result, you can use memcpy() as an alternative way to
+  -- display the entire sprite sheet onto the screen without using spr().
+
+  -- use fl_blends
+
+  for x = 0, 15 do
+    for y = 0, 15 do
+      local screenaddr = 0x6000 + shl(y, 6) + shl(x, 1)
+      local light = lightmap[x + 1][y + 1]
+      local blend = fl_blends[light]
+
+      for addr = screenaddr, screenaddr + 63 do
+        poke(
+          addr,
+          peek(bor(blend, peek(addr)))
+        )
+      end
+    end
+  end
+end
+
 -- dt_ functions are from Dank Tomb tech demo
 -- https://www.lexaloffle.com/bbs/?tid=28785
 
@@ -360,6 +420,25 @@ function dt_init_blending_tables(nlevels)
         )
         addr += 1
       end
+    end
+  end
+end
+
+function dt_fl_blend(l)
+  local lutaddr = 0x4300 + l << 8
+
+  printh(l .. ": " .. lutaddr)
+
+  return function(x1, x2, y)
+    local laddr = lutaddr
+    local yaddr = 0x6000 + shl(y, 6)
+    local saddr, eaddr = yaddr + band(shr(x1 + 1, 1), 0xffff), yaddr + band(shr(x2 - 1, 1), 0xffff)
+
+    for addr = saddr, eaddr do
+      poke(
+        addr,
+        peek(bor(laddr, peek(addr)))
+      )
     end
   end
 end
