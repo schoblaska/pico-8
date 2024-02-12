@@ -13,6 +13,11 @@ function _init()
   }
 
   lightmap = {}
+  maxlight = {}
+
+  for x = 0, 15 do
+    maxlight[x + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  end
 
   player = {
     x = 6, y = 8,
@@ -238,7 +243,11 @@ function darken_squares()
   for x = 0, 15 do
     for y = 0, 15 do
       if lightmap[x + 1][y + 1] < 3 then
-        spr(3, x * 8, y * 8)
+        if maxlight[x + 1][y + 1] > 0 then
+          spr(1, x * 8, y * 8)
+        else
+          spr(3, x * 8, y * 8)
+        end
       end
     end
   end
@@ -260,7 +269,10 @@ function update_lightmap()
 
       if has_los then
         local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
-        lightmap[x + 1][y + 1] = max(0, flr(6 - pdist))
+        local bri = max(0, flr(6 - pdist))
+
+        lightmap[x + 1][y + 1] = bri
+        maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
       else
         lightmap[x + 1][y + 1] = 0
       end
@@ -284,7 +296,9 @@ function update_lightmap()
           if is_floor and is_in_bounds and lightmap[fx + 1][fy + 1] > 0 then
             local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
             local bri = max(0, flr(6 - pdist))
+
             lightmap[x + 1][y + 1] = bri
+            maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
           end
         end
       end
