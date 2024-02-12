@@ -283,37 +283,35 @@ end
 function update_lightmap()
   for x = 0, 15 do
     for y = 0, 15 do
-      lightmap[x + 1][y + 1] = 0
-    end
-  end
-
-  local queue = { { player.x, player.y, 6 } }
-  local visited = {}
-
-  while #queue > 0 do
-    local node = queue[1]
-    visited[node[1] .. "," .. node[2]] = true
-    del(queue, node)
-
-    local x, y, light = node[1], node[2], node[3]
-
-    if lightmap[x + 1][y + 1] < light then
-      lightmap[x + 1][y + 1] = light
-    end
-
-    local is_wall = fget(mget(x, y), 0)
-
-    if light > 0 and not is_wall then
-      for dir in all({ { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }) do
-        local newx, newy = x + dir[1], y + dir[2]
-        local in_bounds = newx > -1 and newx < 16 and newy > -1 and newy < 16
-
-        if in_bounds and not visited[newx .. "," .. newy] and not is_wall then
-          add(queue, { newx, newy, light - 1 })
-        end
+      if line_of_sight(player.x, player.y, x, y) then
+        lightmap[x + 1][y + 1] = max(0, flr(6 - dist(player.x, player.y, x, y)))
+      else
+        lightmap[x + 1][y + 1] = 0
       end
     end
   end
+end
+
+function line_of_sight(x1, y1, x2, y2)
+  local dx = x2 - x1
+  local dy = y2 - y1
+  local steps = max(abs(dx), abs(dy))
+  local sx = dx / steps
+  local sy = dy / steps
+  local x, y = x1, y1
+
+  for i = 1, steps do
+    x += sx
+    y += sy
+
+    local tile = mget(x, y)
+
+    if fget(tile, 0) then
+      return x == x2 and y == y2
+    end
+  end
+
+  return true
 end
 
 function update_enemy(enemy)
