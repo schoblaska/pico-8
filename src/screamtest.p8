@@ -32,8 +32,6 @@ function _init()
     end
   end
 
-  show_lightmap = false
-
   player = {
     x = 6, y = 8,
     offset = { x = 0, y = 0 },
@@ -135,11 +133,6 @@ function _update60()
   update_func()
   update_player()
 
-  -- for debugging; always listen for this input
-  if btnp(5) then
-    show_lightmap = not show_lightmap
-  end
-
   for enemy in all(enemies) do
     update_enemy(enemy)
   end
@@ -163,17 +156,9 @@ function _draw()
     draw_entity(enemy)
   end
 
-  if show_lightmap then
-    for x = 0, 15 do
-      for y = 0, 15 do
-        local l = lightmap[x + 1][y + 1]
-        print(l, x * 8 + 2, y * 8 + 2, 12)
-      end
-    end
-  end
-
   -- apply_lighting()
   darken_squares()
+  print("cpu: " .. stat(1), 1, 1, 6)
 end
 
 function wait_for_player_input()
@@ -271,7 +256,7 @@ function darken_squares()
 
   for x = 0, 31 do
     for y = 0, 31 do
-      if lightmap[x + 1][y + 1] < 2 then
+      if lightmap[x + 1][y + 1] < 3 then
         spr(3, x * 4, y * 4, 0.5, 0.5)
       end
     end
@@ -291,6 +276,30 @@ function update_lightmap()
         lightmap[x + 1][y + 1] = max(0, flr(6 - dist(player.x, player.y, gx + 0.5, gy + 0.5)))
       else
         lightmap[x + 1][y + 1] = 0
+      end
+    end
+  end
+
+  -- for all wall blocks, if they are adjacent to an illuminated floor block
+  -- they should be illuminated as well
+  for x = 0, 31 do
+    for y = 0, 31 do
+      local is_wall = fget(mget(x / 2, y / 2), 0)
+
+      if is_wall then
+        for dx = -1, 1 do
+          for dy = -1, 1 do
+            local gx = x + dx
+            local gy = y + dy
+            local is_floor = not fget(mget(gx / 2, gy / 2), 0)
+            local is_in_bounds = gx >= 0 and gx < 32 and gy >= 0 and gy < 32
+
+            if is_floor and is_in_bounds and lightmap[gx + 1][gy + 1] > 0 then
+              local bri = flr(6 - dist(player.x, player.y, flr(x / 2) + 0.5, flr(y / 2) + 0.5))
+              lightmap[x + 1][y + 1] = bri
+            end
+          end
+        end
       end
     end
   end
