@@ -173,7 +173,7 @@ function _draw()
   end
 
   darken_squares()
-  -- print("cpu: " .. stat(1), 1, 1, 6)
+  print("cpu: " .. stat(1), 74, 2, 1)
 end
 
 function wait_for_player_input()
