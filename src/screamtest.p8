@@ -3,8 +3,6 @@ version 41
 __lua__
 
 function _init()
-  dt_init_blending_tables(6)
-
   floorfill = {
     176, 177, 178, 179, 163,
     147, 148, 149,
@@ -12,15 +10,6 @@ function _init()
     147, 148, 149,
     147, 148, 149,
     147, 148, 149
-  }
-
-  fl_blends = {
-    dt_fl_blend(1),
-    dt_fl_blend(2),
-    dt_fl_blend(3),
-    dt_fl_blend(4),
-    dt_fl_blend(5),
-    dt_fl_blend(6)
   }
 
   lightmap = {}
@@ -156,9 +145,8 @@ function _draw()
     draw_entity(enemy)
   end
 
-  -- apply_lighting()
   darken_squares()
-  print("cpu: " .. stat(1), 1, 1, 6)
+  -- print("cpu: " .. stat(1), 1, 1, 6)
 end
 
 function wait_for_player_input()
@@ -272,8 +260,10 @@ function update_lightmap()
     for y = 0, 31 do
       local gx = flr(x / 2)
       local gy = flr(y / 2)
-      if line_of_sight(player.x, player.y, gx, gy, x % 2, y % 2) then
-        lightmap[x + 1][y + 1] = max(0, flr(6 - dist(player.x, player.y, gx + 0.5, gy + 0.5)))
+      local pdist = dist(player.x, player.y, gx + 0.5, gy + 0.5)
+
+      if pdist < 7 and line_of_sight(player.x, player.y, gx, gy, x % 2, y % 2) then
+        lightmap[x + 1][y + 1] = max(0, flr(6 - pdist))
       else
         lightmap[x + 1][y + 1] = 0
       end
@@ -285,8 +275,9 @@ function update_lightmap()
   for x = 0, 31 do
     for y = 0, 31 do
       local is_wall = fget(mget(x / 2, y / 2), 0)
+      local pdist = dist(player.x, player.y, flr(x / 2) + 0.5, flr(y / 2) + 0.5)
 
-      if is_wall then
+      if pdist < 7 and is_wall then
         for dx = -1, 1 do
           for dy = -1, 1 do
             local gx = x + dx
@@ -295,7 +286,7 @@ function update_lightmap()
             local is_in_bounds = gx >= 0 and gx < 32 and gy >= 0 and gy < 32
 
             if is_floor and is_in_bounds and lightmap[gx + 1][gy + 1] > 0 then
-              local bri = flr(6 - dist(player.x, player.y, flr(x / 2) + 0.5, flr(y / 2) + 0.5))
+              local bri = max(0, flr(6 - pdist))
               lightmap[x + 1][y + 1] = bri
             end
           end
@@ -367,95 +358,6 @@ end
 function dist(ax, ay, bx, by)
   local dx, dy = ax - bx, ay - by
   return sqrt(dx * dx + dy * dy)
-end
-
-function apply_lighting()
-  -- loop through each address in screen memory
-  -- look up the light level of the corresponding grid tile (in lightmap)
-  -- then use the appropriate blending tile to replace the colors
-  -- eg:
-  --
-  -- for screenaddr=start,end do
-  --   poke(screenaddr,
-  --     peek(bor(lutaddr,peek(screenaddr)))
-  --   )
-  -- end
-  --
-  -- from the PICO-8 manual entry on screen memory:
-  --
-  -- Screen data
-  -- This 8,192-byte (8 KiB) region contains the graphics buffer. This is what is
-  -- modified by the built-in drawing functions, and is what is copied to the
-  -- actual display at the end of the game loop or by a call to flip().
-  --
-  -- 0x6000..0x7fff / 24576..32767
-  --
-  -- All 128 rows of the screen, top to bottom. Each row contains 128 pixels in
-  -- 64 bytes. Each byte contains two adjacent pixels, with the low 4 bits being
-  -- the left/even pixel and the high 4 bits being the right/odd pixel.
-  --
-  -- This is essentially the same format as the sprite sheet at 0x0000..0x1fff
-  -- (see above). As a result, you can use memcpy() as an alternative way to
-  -- display the entire sprite sheet onto the screen without using spr().
-
-  -- use fl_blends
-
-  for x = 0, 15 do
-    for y = 0, 15 do
-      local screenaddr = 0x6000 + shl(y, 6) + shl(x, 1)
-      local light = lightmap[x + 1][y + 1]
-      local blend = fl_blends[light]
-
-      for addr = screenaddr, screenaddr + 63 do
-        poke(
-          addr,
-          peek(bor(blend, peek(addr)))
-        )
-      end
-    end
-  end
-end
-
--- dt_ functions are from Dank Tomb tech demo
--- https://www.lexaloffle.com/bbs/?tid=28785
-
-function dt_init_blending_tables(nlevels)
-  local blend_table_start_x = 64
-
-  for lv = 1, nlevels do
-    local addr = 0x4300 + lv * 0x100
-    local sx = lv - 1 + blend_table_start_x
-    for c1 = 0, 15 do
-      local nc = sget(sx, c1)
-      local topl = shl(nc, 4)
-      for c2 = 0, 15 do
-        poke(
-          addr,
-          topl + sget(sx, c2)
-        )
-        addr += 1
-      end
-    end
-  end
-end
-
-function dt_fl_blend(l)
-  local lutaddr = 0x4300 + l << 8
-
-  printh(l .. ": " .. lutaddr)
-
-  return function(x1, x2, y)
-    local laddr = lutaddr
-    local yaddr = 0x6000 + shl(y, 6)
-    local saddr, eaddr = yaddr + band(shr(x1 + 1, 1), 0xffff), yaddr + band(shr(x2 - 1, 1), 0xffff)
-
-    for addr = saddr, eaddr do
-      poke(
-        addr,
-        peek(bor(laddr, peek(addr)))
-      )
-    end
-  end
 end
 
 __gfx__
