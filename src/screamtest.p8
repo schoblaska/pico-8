@@ -7,12 +7,15 @@ __lua__
 -- maybe a 32x32 grid would be better
 -- but still calculate a 16x16 light grid for tile visibility
 -- 32x32 does better for illuminating walls of adjacent tiles
+-- though, maybe that effect is the wrong way to go about it, and a 32x32 grid
+-- is a can of worms. having everything on one 16x16 grid simplifies a lot
 --
--- better wall highlighting
--- walls should take the _lesser_ of 1) their brightness as calculated by
--- distance to player, and 2) the brightest adjoining floor tile. this way, a
--- "close" side of a wall won't be brighter than the floor tile causing it to
--- be visible
+-- better concave corner highlighting
+-- pre-compute corners that should illuminate if certain combinations of
+-- adjoining floor and wall tiles are illuminated. for example, if a tile is a
+-- wall, has a wall below it, a wall to the right, and an open space to the
+-- bottom right, it should be considered visible to the player if all three of
+-- those squares are
 --
 -- it'd be cool to get actual dynamic lighting working
 -- still grid-based, but do the peek / poke screen memory trick to actually
@@ -24,6 +27,24 @@ __lua__
 -- tiles it illuminates as long as the player has line of sight to those tiles.
 -- i.e., even if they are too far away for a player to normally see, an
 -- illuminated tile that the player has LOS to will always be visible
+--
+-- better calculations
+-- have a layer of global illumination, without considering any walls (illum)
+-- have another layer of binary values: player has line of sight, true or false (los)
+-- keep another map for the max active illum value ever recorded for each
+--   square (max_active_illum)
+--   this acts as a sort of fog of war clearer
+--   assume 3 is the light level used to illuminate squares that have been seen by
+--   the player but are not actively visible
+-- generate current active illumination for each square (active_illum)
+--   first combine illum and los - tiles the player can currently see
+--   then update each square to take the max_active_illum into account, up to
+--   3. that is, if the fog of war illumination is greater, use that instead of
+--   the active illumination
+-- enemies sprites are only rendered if they are in an active_illum square
+--   that's => 3 (or whatever number was used as the max brightness level for
+--   the fog of war)
+-- now use active_illum to darken all squares appropriately
 
 function _init()
   floorfill = {
