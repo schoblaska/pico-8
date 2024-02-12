@@ -253,12 +253,6 @@ function update_player()
 end
 
 function update_lightmap()
-  -- lightmap is a 16 x 16 array containing the illumination value of each x, y coordinate
-  -- the player x, y is brightness 6
-  -- each square you move away from the player, brightness decreases by one level
-  -- walls (flag 0) will block light, but be illuminated themselves
-  -- this function updates the values in lightmap based on current player location
-
   for x = 0, 15 do
     for y = 0, 15 do
       lightmap[x + 1][y + 1] = 0
@@ -279,11 +273,14 @@ function update_lightmap()
       lightmap[x + 1][y + 1] = light
     end
 
-    if light > 0 then
+    local is_wall = fget(mget(x, y), 0)
+
+    if light > 0 and not is_wall then
       for dir in all({ { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }) do
         local newx, newy = x + dir[1], y + dir[2]
+        local in_bounds = newx > -1 and newx < 16 and newy > -1 and newy < 16
 
-        if not visited[newx .. "," .. newy] and open_space(newx, newy) then
+        if in_bounds and not visited[newx .. "," .. newy] and not is_wall then
           add(queue, { newx, newy, light - 1 })
         end
       end
