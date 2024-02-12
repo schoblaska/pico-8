@@ -19,6 +19,12 @@ function _init()
     maxlight[x + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
   end
 
+  alt_pals = {}
+
+  build_alt_pal(1, 4)
+  build_alt_pal(2, 3)
+  build_alt_pal(3, 2)
+
   player = {
     x = 6, y = 8,
     offset = { x = 0, y = 0 },
@@ -243,8 +249,11 @@ function darken_squares()
   for x = 0, 15 do
     for y = 0, 15 do
       if lightmap[x + 1][y + 1] < 3 then
-        if maxlight[x + 1][y + 1] > 0 then
-          spr(1, x * 8, y * 8)
+        local tmaxlight = min(3, maxlight[x + 1][y + 1])
+
+        if tmaxlight > 0 then
+          swap_pal(tmaxlight)
+          spr(mget(x, y), x * 8, y * 8)
         else
           spr(3, x * 8, y * 8)
         end
@@ -252,7 +261,29 @@ function darken_squares()
     end
   end
 
-  palt()
+  pal()
+  -- palt()
+end
+
+function swap_pal(n)
+  pal()
+  palt(0, false)
+
+  for swap_pair in all(alt_pals[n]) do
+    pal(swap_pair[1], swap_pair[2])
+  end
+end
+
+function build_alt_pal(n, offset)
+  alt_pals[n] = {}
+
+  for y = 0, 16 do
+    local orig, alt = sget(64, y), sget(64 + offset, y)
+
+    if orig ~= alt then
+      add(alt_pals[n], { orig, alt })
+    end
+  end
 end
 
 function update_lightmap()
@@ -379,7 +410,7 @@ __gfx__
 0070070011111111dddddddd000000000000055ee55000000000022ee22000005511100000000000000000000000000000000000000000000000000000000000
 0000000011111111dddddddd0000000005550ee00ee0555002220ee00ee0222066d5100000000000000000000000000000000000000000000000000000000000
 0000000011111111dddddddd00000000eeee00000000eeeeeeee00000000eeee776d100000000000000000000000000000000000000000000000000000000000
-0000000000a0a00000a0a00000a0a0000eeeeee00000000008888880000000008888800000000000000000000000000000000000000000000000000000000000
+0000000000a0a00000a0a00000a0a0000eeeeee00000000008888880000000008822100000000000000000000000000000000000000000000000000000000000
 000000000bbbbba00bbbbba00bbbbba0ee1e1eeb000000008828288e000000009422100000000000000000000000000000000000000000000000000000000000
 00000000b1b1bbb0b1b1bbb0b1b1bbb0be1e1ebe0eeeeee0e82828e200000000a942100000000000000000000000000000000000000000000000000000000000
 00000000b1b1bbbab1b1bbbab1b1bbea0eeeeee0ee1e1eee0888888008888880bb33100000000000000000000000000000000000000000000000000000000000
