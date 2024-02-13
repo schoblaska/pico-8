@@ -31,19 +31,23 @@ __lua__
 -- better calculations
 -- have a layer of global illumination, without considering any walls (illum)
 -- have another layer of binary values: player has line of sight, true or false (los)
--- keep another map for the max active illum value ever recorded for each
---   square (max_active_illum)
---   this acts as a sort of fog of war clearer
---   assume 3 is the light level used to illuminate squares that have been seen by
---   the player but are not actively visible
+-- keep another map for the fog reveal value for each square (fog_reveal)
+--   choose low value like 2 - squares in fog_reveal are in the range 0-2
+--   map tiles are darkened to the brighter of (illum, fog_reveal)
 -- generate current active illumination for each square (active_illum)
 --   first combine illum and los - tiles the player can currently see
 --   then update each square to take the max_active_illum into account, up to
 --   3. that is, if the fog of war illumination is greater, use that instead of
 --   the active illumination
 -- enemies sprites are only rendered if they are in an active_illum square
---   that's => 3 (or whatever number was used as the max brightness level for
+--   that's => 2 (or whatever number was used as the max brightness level for
 --   the fog of war)
+--   or maybe render them as long as they're on an active_illum square, even if
+--   it's below the fog_clear brightness
+--   when rendering a moving sprite, take "to" and "from" squares into account.
+--   draw the sprite if player has LOS to either of these squares. this
+--   way, sprites won't instantly appear / disappear when they move in or out
+--   of LOS. may be necessary then to re-draw non-LOS map tiles to cover up sprites
 -- now use active_illum to darken all squares appropriately
 
 function _init()
