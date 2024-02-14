@@ -170,7 +170,7 @@ function _init()
   update_lightmap()
 end
 
-function _update60()
+function _update()
   update_func()
   update_player()
 
@@ -183,7 +183,7 @@ function _draw()
   for x = 0, 15 do
     for y = 0, 15 do
       local sprite = mget(x, y)
-      local bri = lightmap[x + 1][y + 1]
+      local bri = max(maxlight[x + 1][y + 1], lightmap[x + 1][y + 1])
 
       palt(0, false)
 
@@ -311,7 +311,7 @@ function darken_squares()
   for x = 0, 15 do
     for y = 0, 15 do
       if lightmap[x + 1][y + 1] == 0 then
-        local tmaxlight = min(3, maxlight[x + 1][y + 1])
+        local tmaxlight = maxlight[x + 1][y + 1]
 
         if tmaxlight > 0 then
           swap_pal(tmaxlight)
@@ -364,7 +364,7 @@ function update_lightmap()
         local bri = max(0, ceil(6 - pdist))
 
         lightmap[x + 1][y + 1] = bri
-        maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
+        maxlight[x + 1][y + 1] = min(2, max(bri, maxlight[x + 1][y + 1]))
       else
         lightmap[x + 1][y + 1] = 0
       end
@@ -406,7 +406,7 @@ end
 
 function should_act(entity, player_moved)
   local standing_still = entity.offset.x == 0 and entity.offset.y == 0
-  local player_idled = player.idle > 0 and player.idle % 120 == 0
+  local player_idled = player.idle > 0 and player.idle % 40 == 0
 
   return standing_still and (player_idled or player_moved)
 end
@@ -418,12 +418,16 @@ function update_animations(entity)
     entity.frame += 1
   end
 
-  if entity.offset.x ~= 0 then
-    entity.offset.x += 2 * -sgn(entity.offset.x)
+  if entity.offset.x > 0 then
+    entity.offset.x = max(0, entity.offset.x - 3)
+  elseif entity.offset.x < 0 then
+    entity.offset.x = min(0, entity.offset.x + 3)
   end
 
-  if entity.offset.y ~= 0 then
-    entity.offset.y += 2 * -sgn(entity.offset.y)
+  if entity.offset.y > 0 then
+    entity.offset.y = max(0, entity.offset.y - 3)
+  elseif entity.offset.y < 0 then
+    entity.offset.y = min(0, entity.offset.y + 3)
   end
 end
 
