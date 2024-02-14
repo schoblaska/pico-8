@@ -180,21 +180,28 @@ function _update()
 end
 
 function _draw()
+  local lastpal = 0
+
   for x = 0, 15 do
     for y = 0, 15 do
       local sprite = mget(x, y)
       local bri = max(maxlight[x + 1][y + 1], lightmap[x + 1][y + 1])
 
-      palt(0, false)
-
       if bri > 0 and bri < 4 then
-        swap_pal(bri)
+        if bri ~= lastpal then
+          lastpal = bri
+          swap_pal(bri)
+        end
+      else
+        pal()
       end
 
+      palt(0, false)
       spr(sprite, x * 8, y * 8)
-      pal()
     end
   end
+
+  pal()
 
   draw_entity(player)
 
@@ -319,6 +326,8 @@ function update_player()
 end
 
 function darken_squares()
+  local lastpal = 0
+
   palt(0, false)
 
   for x = 0, 15 do
@@ -327,7 +336,11 @@ function darken_squares()
         local tmaxlight = maxlight[x + 1][y + 1]
 
         if tmaxlight > 0 then
-          swap_pal(tmaxlight)
+          if tmaxlight ~= lastpal then
+            swap_pal(tmaxlight)
+            lastpal = tmaxlight
+          end
+
           spr(mget(x, y), x * 8, y * 8)
         else
           spr(3, x * 8, y * 8)
