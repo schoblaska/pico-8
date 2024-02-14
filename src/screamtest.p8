@@ -180,16 +180,21 @@ function _update60()
 end
 
 function _draw()
-  palt(0, false)
-
   for x = 0, 15 do
     for y = 0, 15 do
       local sprite = mget(x, y)
+      local bri = lightmap[x + 1][y + 1]
+
+      palt(0, false)
+
+      if bri > 0 and bri < 4 then
+        swap_pal(bri)
+      end
+
       spr(sprite, x * 8, y * 8)
+      pal()
     end
   end
-
-  palt()
 
   draw_entity(player)
 
@@ -276,14 +281,23 @@ end
 
 function draw_entity(entity)
   local sprite = entity.sprites[flr(entity.frame / entity.anim_speed) + 1]
+  local bri = lightmap[entity.x + 1][entity.y + 1]
 
-  spr(
-    sprite,
-    entity.x * 8 + entity.offset.x,
-    entity.y * 8 + entity.offset.y,
-    1, 1,
-    entity.flip
-  )
+  if bri > 0 then
+    if bri < 4 then
+      swap_pal(bri)
+    end
+
+    spr(
+      sprite,
+      entity.x * 8 + entity.offset.x,
+      entity.y * 8 + entity.offset.y,
+      1, 1,
+      entity.flip
+    )
+  end
+
+  pal()
 end
 
 function update_player()
@@ -296,7 +310,7 @@ function darken_squares()
 
   for x = 0, 15 do
     for y = 0, 15 do
-      if lightmap[x + 1][y + 1] < 3 then
+      if lightmap[x + 1][y + 1] == 0 then
         local tmaxlight = min(3, maxlight[x + 1][y + 1])
 
         if tmaxlight > 0 then
@@ -347,39 +361,12 @@ function update_lightmap()
 
       if has_los then
         local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
-        local bri = max(0, flr(6 - pdist))
+        local bri = max(0, ceil(6 - pdist))
 
         lightmap[x + 1][y + 1] = bri
         maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
       else
         lightmap[x + 1][y + 1] = 0
-      end
-    end
-  end
-
-  -- for all wall blocks, if they are adjacent to an illuminated floor block
-  -- they should be illuminated as well
-  for x = losx1, losx2 do
-    for y = losy1, losy2 do
-      local is_wall = fget(mget(x, y), 0)
-
-      -- TODO: pre-compute wall subblocks and neighboring floor subblocks
-      for dx = -1, 1 do
-        for dy = -1, 1 do
-          local fx = x + dx
-          local fy = y + dy
-          local is_floor = not fget(mget(fx, fy), 0)
-          local is_in_bounds = fx >= 0 and fx <= 15 and fy >= 0 and fy <= 15
-
-          if is_floor and is_in_bounds and lightmap[fx + 1][fy + 1] > 0 then
-            local pdist = dist(player.x, player.y, x + 0.5, y + 0.5)
-            local bri = max(0, flr(6 - pdist))
-
-            -- TODO: this only works well on a 32 x 32 light grid
-            -- lightmap[x + 1][y + 1] = bri
-            -- maxlight[x + 1][y + 1] = max(bri, maxlight[x + 1][y + 1])
-          end
-        end
       end
     end
   end
