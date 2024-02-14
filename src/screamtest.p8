@@ -79,7 +79,7 @@ function _init()
     idle = 0,
     sprites = { 17, 18, 19 },
     frame = 0,
-    anim_speed = 30,
+    anim_speed = 15,
     flip = false
   }
 
@@ -89,7 +89,7 @@ function _init()
     idle = 0,
     sprites = { 33, 34 },
     frame = 0,
-    anim_speed = 45,
+    anim_speed = 25,
     flip = false,
     act = function(self, player_moved)
       if should_act(self, player_moved) then
@@ -117,7 +117,7 @@ function _init()
     red_sprites = { 6, 7 },
     red = false,
     frame = 0,
-    anim_speed = 60,
+    anim_speed = 30,
     flip = false,
     act = function(self, player_moved)
       if should_act(self, player_moved) then
@@ -203,7 +203,20 @@ function _draw()
   end
 
   darken_squares()
-  print("cpu: " .. stat(1), 74, 2, 1)
+  print_cpu()
+end
+
+function print_cpu()
+  local color = 1
+  local cpu = flr(stat(1) * 100)
+
+  if cpu > 100 then
+    color = 4
+  elseif cpu > 50 then
+    color = 2
+  end
+
+  print("cpu: " .. cpu .. "%", 74, 2, color)
 end
 
 function wait_for_player_input()
