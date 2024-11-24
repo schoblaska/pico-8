@@ -89,30 +89,48 @@ function player_move(x, y)
   local can_move_x = true
   local can_move_y = true
 
-  if x != 0 then
-    -- check horizontal movement
-    local check_x = x > 0 and flr((new_x + 7) / 8) or flr(new_x / 8)
-    local top_y = flr(player.y / 8)
-    local bottom_y = flr((player.y + 7) / 8)
+  if x ~= 0 then
+    -- coordinates describing the column of pixels the player is trying to move
+    -- horizontally into
+    local movecolx = x > 0 and flr((new_x + 7) / 8) or flr(new_x / 8)
+    local movecoly1 = flr(player.y / 8)
+    local movecoly2 = flr((player.y + 7) / 8)
 
-    for check_y = top_y, bottom_y do
-      if fget(mget(check_x, check_y), 0) then
-        can_move_x = false
-        break
+    local top_blocked = fget(mget(movecolx, movecoly1), 0)
+    local bottom_blocked = fget(mget(movecolx, movecoly2), 0)
+
+    if top_blocked or bottom_blocked then
+      can_move_x = false
+    end
+
+    -- nudge player towards opening if they're misaligned
+    if y == 0 and not can_move_x then
+      if not top_blocked and (player.y % 8) < 5 then
+        return player_move(x, -1)
+      elseif not bottom_blocked and (player.y % 8) > 3 then
+        return player_move(x, 1)
       end
     end
   end
 
-  if y != 0 then
-    -- check vertical movement
-    local check_y = y > 0 and flr((new_y + 7) / 8) or flr(new_y / 8)
-    local left_x = flr(player.x / 8)
-    local right_x = flr((player.x + 7) / 8)
+  if y ~= 0 then
+    local moverowy = y > 0 and flr((new_y + 7) / 8) or flr(new_y / 8)
+    local moverowx1 = flr(player.x / 8)
+    local moverowx2 = flr((player.x + 7) / 8)
 
-    for check_x = left_x, right_x do
-      if fget(mget(check_x, check_y), 0) then
-        can_move_y = false
-        break
+    local left_blocked = fget(mget(moverowx1, moverowy), 0)
+    local right_blocked = fget(mget(moverowx2, moverowy), 0)
+
+    if left_blocked or right_blocked then
+      can_move_y = false
+    end
+
+    -- nudge player towards opening if they're misaligned
+    if x == 0 and not can_move_y then
+      if not left_blocked and (player.x % 8) < 5 then
+        return player_move(-1, y)
+      elseif not right_blocked and (player.x % 8) > 3 then
+        return player_move(1, y)
       end
     end
   end
