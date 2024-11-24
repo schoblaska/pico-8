@@ -35,7 +35,7 @@ end
 function _draw()
   cls()
   map()
-  spr(sk.player, player.x, player.y)
+  spr(sk.player, player.x, player.y, 1, 1, player.facing == "l" and true or false)
 end
 
 function _update60()
