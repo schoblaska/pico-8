@@ -38,16 +38,69 @@ function _draw()
   spr(sk.player, player.x, player.y)
 end
 
-function _update()
-  if btnp(0) then
-    player.x -= 1
-  elseif btnp(1) then
-    player.x += 1
-  elseif btnp(2) then
-    player.y -= 1
-  elseif btnp(3) then
-    player.y += 1
+function _update60()
+  move = { x = 0, y = 0 }
+
+  if btn(0) then move.x = -1 end
+  if btn(1) then move.x = 1 end
+  if btn(2) then move.y = -1 end
+  if btn(3) then move.y = 1 end
+
+  player_move(move.x, move.y)
+end
+
+-- this engine works like Zelda: A Link to the Past in that the map is a grid
+-- of 8x8 sprites, but the player is not locked to that grid and can move pixel
+-- by pixel. when the player attempts to move, we need to perform collision
+-- detection on any squares they are trying to enter, and only allow movement
+-- into open space. a sprite tile is a wall if `fget(sprite_id, 1)` is true
+function player_move(x, y)
+  -- update player facing direction
+  if x < 0 then
+    player.facing = "l"
+  elseif x > 0 then
+    player.facing = "r"
   end
+
+  -- calculate target position
+  local new_x = player.x + x
+  local new_y = player.y + y
+
+  -- try horizontal and vertical movement separately
+  local can_move_x = true
+  local can_move_y = true
+
+  if x != 0 then
+    -- check horizontal movement
+    local check_x = x > 0 and flr((new_x + 7) / 8) or flr(new_x / 8)
+    local top_y = flr(player.y / 8)
+    local bottom_y = flr((player.y + 7) / 8)
+
+    for check_y = top_y, bottom_y do
+      if fget(mget(check_x, check_y), 0) then
+        can_move_x = false
+        break
+      end
+    end
+  end
+
+  if y != 0 then
+    -- check vertical movement
+    local check_y = y > 0 and flr((new_y + 7) / 8) or flr(new_y / 8)
+    local left_x = flr(player.x / 8)
+    local right_x = flr((player.x + 7) / 8)
+
+    for check_x = left_x, right_x do
+      if fget(mget(check_x, check_y), 0) then
+        can_move_y = false
+        break
+      end
+    end
+  end
+
+  -- apply allowed movements
+  if can_move_x then player.x = new_x end
+  if can_move_y then player.y = new_y end
 end
 
 __gfx__
