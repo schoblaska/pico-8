@@ -23,6 +23,10 @@ function _init()
     moving = false
   }
 
+  camera = { x = 0, y = 0 }
+
+  -- initialize tiles (put a floor tile under the player; sprinkle in alternate
+  -- floor tiles)
   for x = 0, 255 do
     for y = 0, 255 do
       sprite = mget(x, y)
@@ -30,6 +34,8 @@ function _init()
       if sprite == sk.player.idle then
         player.x = x * 8
         player.y = y * 8
+        camera.x = player.x - 64
+        camera.y = player.y - 64
         mset(x, y, sk.floor)
       elseif sprite == sk.floor and rnd(4) < 1 then
         mset(x, y, rnd(sk.floor_alts))
@@ -40,7 +46,8 @@ end
 
 function _draw()
   cls()
-  map()
+
+  draw_map()
 
   -- get current sprite based on animation frame
   local sprite = sk.player.idle
@@ -49,7 +56,7 @@ function _draw()
     sprite = sk.player.walk[frame_idx]
   end
 
-  spr(sprite, player.x, player.y, 1, 1, player.facing == "l" and true or false)
+  spr(sprite, player.x - camera.x, player.y - camera.y, 1, 1, player.facing == "l" and true or false)
 end
 
 function _update60()
@@ -66,6 +73,25 @@ function _update60()
   end
 
   player_move(move.x, move.y)
+end
+
+function draw_map()
+  -- convert camera position to map tile coordinates
+  local start_x = flr(camera.x / 8)
+  local start_y = flr(camera.y / 8)
+
+  -- draw 17x17 tiles to cover 128x128 screen plus 1 tile overflow
+  for x = start_x, start_x + 16 do
+    for y = start_y, start_y + 16 do
+      -- get sprite at map position
+      local sprite = mget(x, y)
+      -- calculate screen position by subtracting camera offset
+      local screen_x = x * 8 - camera.x
+      local screen_y = y * 8 - camera.y
+      -- draw sprite
+      spr(sprite, screen_x, screen_y)
+    end
+  end
 end
 
 -- this engine works like Zelda: A Link to the Past in that the map is a grid
@@ -141,6 +167,27 @@ function player_move(x, y)
     if can_move_y then player.y = new_y end
     player.moving = true
     player.frame += 1
+
+    -- keep player away from screen edges by adjusting camera
+    local min_edge_dist = 50
+    local max_x = 127 - min_edge_dist
+    local max_y = 127 - min_edge_dist
+
+    -- calculate camera position needed to keep player in bounds
+    local cam_x = 0
+    local cam_y = 0
+
+    if player.x - camera.x < min_edge_dist then
+      camera.x = player.x - min_edge_dist
+    elseif player.x - camera.x > max_x then
+      camera.x = player.x - max_x
+    end
+
+    if player.y - camera.y < min_edge_dist then
+      camera.y = player.y - min_edge_dist
+    elseif player.y - camera.y > max_y then
+      camera.y = player.y - max_y
+    end
   else
     player.moving = false
     player.frame = 0
