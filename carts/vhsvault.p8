@@ -1,7 +1,6 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
-
 -- vhs vault: sokoban sepulcher
 
 function _init()
@@ -1686,7 +1685,7 @@ function add_light_source(luminosity, lumx, lumy)
 end
 
 -- light layer 0
--- acitvely lit map tiles
+-- actively lit map tiles
 function draw_ll0()
   local lastpal = 0
 

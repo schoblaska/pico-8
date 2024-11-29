@@ -49,6 +49,8 @@ function _init()
       end
     end
   end
+
+  refresh_lightmap()
 end
 
 function _draw()
@@ -66,7 +68,7 @@ function _draw()
   spr(sprite, player.x - camera.x, player.y - camera.y, 1, 1, player.facing == "l" and true or false)
 
   -- debugging
-  draw_lightmap()
+  -- draw_lightmap()
 end
 
 function _update60()
@@ -98,8 +100,11 @@ function draw_map()
       -- calculate screen position by subtracting camera offset
       local screen_x = x * 8 - camera.x
       local screen_y = y * 8 - camera.y
-      -- draw sprite
-      spr(sprite, screen_x, screen_y)
+
+      local brightness = lightmap[x + 1] and lightmap[x + 1][y + 1] or 0 -- temp hack
+      if brightness > 0 then
+        spr(sprite, screen_x, screen_y)
+      end
     end
   end
 end
@@ -197,6 +202,8 @@ function player_move(x, y)
     player.moving = false
     player.frame = 0
   end
+
+  refresh_lightmap()
 end
 
 function is_wall(x, y)
