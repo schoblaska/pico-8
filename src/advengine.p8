@@ -14,16 +14,23 @@ function _init()
     floor_alts = { 23, 48, 49, 50, 51, 52, 53, 54 }
   }
 
+  cfg = {
+    max_brightness = 4
+  }
+
   player = {
     facing = "r",
-    x = 1,
-    y = 1,
+    x = 0,
+    y = 0,
     frame = 0,
     anim_speed = 8, -- lower = faster animation
-    moving = false
+    moving = false,
+    luminosity = 5
   }
 
   camera = { x = 0, y = 0 }
+  los_cache = {}
+  lightmap = {}
 
   -- initialize tiles (put a floor tile under the player; sprinkle in alternate
   -- floor tiles)
@@ -57,6 +64,9 @@ function _draw()
   end
 
   spr(sprite, player.x - camera.x, player.y - camera.y, 1, 1, player.facing == "l" and true or false)
+
+  -- debugging
+  draw_lightmap()
 end
 
 function _update60()
@@ -94,11 +104,6 @@ function draw_map()
   end
 end
 
--- this engine works like Zelda: A Link to the Past in that the map is a grid
--- of 8x8 sprites, but the player is not locked to that grid and can move pixel
--- by pixel. when the player attempts to move, we need to perform collision
--- detection on any squares they are trying to enter, and only allow movement
--- into open space. a sprite tile is a wall if `fget(sprite_id, 1)` is true
 function player_move(x, y)
   -- update player facing direction
   if x < 0 then
@@ -122,8 +127,8 @@ function player_move(x, y)
     local movecoly1 = flr(player.y / 8)
     local movecoly2 = flr((player.y + 7) / 8)
 
-    local top_blocked = fget(mget(movecolx, movecoly1), 0)
-    local bottom_blocked = fget(mget(movecolx, movecoly2), 0)
+    local top_blocked = is_wall(movecolx, movecoly1)
+    local bottom_blocked = is_wall(movecolx, movecoly2)
 
     if top_blocked or bottom_blocked then
       can_move_x = false
@@ -144,8 +149,8 @@ function player_move(x, y)
     local moverowx1 = flr(player.x / 8)
     local moverowx2 = flr((player.x + 7) / 8)
 
-    local left_blocked = fget(mget(moverowx1, moverowy), 0)
-    local right_blocked = fget(mget(moverowx2, moverowy), 0)
+    local left_blocked = is_wall(moverowx1, moverowy)
+    local right_blocked = is_wall(moverowx2, moverowy)
 
     if left_blocked or right_blocked then
       can_move_y = false
@@ -191,6 +196,119 @@ function player_move(x, y)
   else
     player.moving = false
     player.frame = 0
+  end
+end
+
+function is_wall(x, y)
+  return fget(mget(x, y), 0)
+end
+
+function dist(ax, ay, bx, by)
+  local dx, dy = ax - bx, ay - by
+  return sqrt(dx * dx + dy * dy)
+end
+
+function iclamp(val, lower, upper)
+  return flr(max(min(val, upper), lower))
+end
+
+-- lighting code below
+function line_of_sight(x1, y1, x2, y2)
+  local cache_key = x1 .. "," .. y1 .. "," .. x2 .. "," .. y2
+
+  if los_cache[cache_key] then
+    return los_cache[cache_key] == 1 and true or false
+  end
+
+  local x3 = x2 + 0.5 * sgn(x1 - x2)
+  local y3 = y2 + 0.5 * sgn(y1 - y2)
+  local dx, dy = x3 - x1, y3 - y1
+  local steps = max(abs(dx), abs(dy))
+  local sx, sy = dx / steps, dy / steps
+  local x, y = x1, y1
+
+  for i = 1, steps do
+    x += sx
+    y += sy
+
+    if is_wall(x, y) then
+      if flr(x) == x3 and flr(y) == y3 then
+        los_cache[cache_key] = 1
+        return true
+      else
+        los_cache[cache_key] = 0
+        return false
+      end
+    end
+  end
+
+  los_cache[cache_key] = 1
+  return true
+end
+
+function add_light_source(luminosity, lumx, lumy)
+  -- coordinates describing the section of the map that might be illuminated by
+  -- this light source
+  local losx1, losx2 = max(0, lumx - luminosity - 1), min(127, lumx + luminosity + 1)
+  local losy1, losy2 = max(0, lumy - luminosity - 1), min(31, lumy + luminosity + 1)
+
+  for x = losx1, losx2 do
+    for y = losy1, losy2 do
+      local has_los = line_of_sight(lumx, lumy, x, y)
+
+      if has_los then
+        local lumdist = dist(lumx, lumy, x, y)
+        local bri = max(0, min(ceil(luminosity - lumdist), cfg.max_brightness))
+
+        lightmap[x + 1][y + 1] = max(bri, lightmap[x + 1][y + 1])
+      else
+        lightmap[x + 1][y + 1] = max(0, lightmap[x + 1][y + 1])
+      end
+    end
+  end
+end
+
+function refresh_lightmap()
+  lightmap = {}
+
+  for x = 1, 128 do
+    lightmap[x] = {}
+    for y = 1, 32 do
+      lightmap[x][y] = 0
+    end
+  end
+
+  -- determine which map tile the player is "most" on
+  local player_map_x = flr((player.x + 4) / 8)
+  local player_map_y = flr((player.y + 4) / 8)
+
+  add_light_source(player.luminosity, player_map_x, player_map_y)
+end
+
+function draw_lightmap()
+  refresh_lightmap()
+
+  -- convert camera position to map tile coordinates
+  local start_x = iclamp(flr(camera.x / 8), 0, 127)
+  local end_x = iclamp(start_x + 16, 0, 127)
+  local start_y = iclamp(flr(camera.y / 8), 0, 31)
+  local end_y = iclamp(start_y + 16, 0, 31)
+
+  -- draw 17x17 tiles to cover 128x128 screen plus 1 tile overflow
+  for x = start_x, end_x do
+    for y = start_y, end_y do
+      -- calculate screen position by subtracting camera offset
+      local screen_x = x * 8 - camera.x
+      local screen_y = y * 8 - camera.y
+
+      -- get brightness value from lightmap
+      local brightness = lightmap[x + 1][y + 1]
+
+      -- draw brightness number centered in tile
+      if brightness > 0 then
+        print(brightness, screen_x + 3, screen_y + 3, 7)
+      end
+    end
   end
 end
 
