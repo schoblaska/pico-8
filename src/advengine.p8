@@ -31,7 +31,7 @@ function _init()
     frame = 0,
     anim_speed = 8, -- lower = faster animation
     moving = false,
-    luminosity = 4
+    luminosity = 5
   }
 
   camera = { x = 0, y = 0 }
@@ -51,6 +51,15 @@ function _init()
       if orig ~= alt then
         add(alt_pals[bri], { orig, alt })
       end
+    end
+  end
+
+  fogmap = {}
+
+  for x = 1, 128 do
+    fogmap[x] = {}
+    for y = 1, 32 do
+      fogmap[x][y] = false
     end
   end
 
@@ -120,11 +129,6 @@ function swap_pal(bri)
 
   for swap_pair in all(alt_pals[bri]) do
     pal(swap_pair[1], swap_pair[2])
-
-    if bri == 0 then
-      printh(swap_pair[1])
-      printh(swap_pair[2])
-    end
   end
 end
 
@@ -144,10 +148,13 @@ function draw_map()
 
       local brightness = lightmap[x + 1] and lightmap[x + 1][y + 1] or 0 -- temp hack
 
-      if brightness > -1 then
+      if brightness > 0 then
         swap_pal(brightness)
         spr(sprite, screen_x, screen_y)
-        reset_pal()
+        fogmap[x + 1][y + 1] = true
+      elseif fogmap[x + 1] and fogmap[x + 1][y + 1] then
+        swap_pal(brightness)
+        spr(sprite, screen_x, screen_y)
       end
     end
   end
