@@ -87,6 +87,7 @@ function _init()
       elseif sprite == sk.torch[1] then
         torch.x = x * 8
         torch.y = y * 8
+        mset(x, y, sk.floor)
       elseif sprite == sk.floor and rnd(4) < 1 then
         mset(x, y, rnd(sk.floor_alts))
       end
