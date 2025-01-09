@@ -1,7 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
--- adventure game engine demo
+-- deepdark
+-- by schoblaska
 
 function _init()
   reset_pal()
