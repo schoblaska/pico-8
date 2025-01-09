@@ -36,13 +36,7 @@ function _init()
     luminosity = 5
   }
 
-  torch = {
-    x = 0,
-    y = 0,
-    frame = 0,
-    anim_speed = 10,
-    luminosity = 3
-  }
+  torches = {}
 
   camera = { x = 0, y = 0 }
   los_cache = {}
@@ -86,8 +80,17 @@ function _init()
         camera.y = player.y - 64
         mset(x, y, sk.floor)
       elseif sprite == sk.torch[1] then
-        torch.x = x * 8
-        torch.y = y * 8
+        add(
+          torches,
+          {
+            x = x * 8,
+            y = y * 8,
+            frame = 0,
+            anim_speed = 10,
+            luminosity = 3
+          }
+        )
+
         mset(x, y, sk.floor)
       elseif sprite == sk.floor and rnd(4) < 1 then
         mset(x, y, rnd(sk.floor_alts))
@@ -111,12 +114,10 @@ function _draw()
   end
   spr(player_sprite, player.x - camera.x, player.y - camera.y, 1, 1, player.facing == "l" and true or false)
 
-  local torch_sprite = sk.torch[1]
-  if torch.frame > 0 then
-    torch_sprite = sk.torch[flr(torch.frame / torch.anim_speed) % #sk.torch + 1]
+  for torch in all(torches) do
+    local torch_sprite = sk.torch[flr(torch.frame / torch.anim_speed) % #sk.torch + 1]
+    spr(torch_sprite, torch.x - camera.x, torch.y - camera.y, 1, 1, torch.facing == "l" and true or false)
   end
-
-  spr(torch_sprite, torch.x - camera.x, torch.y - camera.y, 1, 1, torch.facing == "l" and true or false)
 
   -- debugging
   -- draw_lightmap()
@@ -136,7 +137,9 @@ function _update60()
   end
 
   player_move(move.x, move.y)
-  torch.frame = (torch.frame + 1) % (torch.anim_speed * #sk.torch)
+  for torch in all(torches) do
+    torch.frame = (torch.frame + 1) % (torch.anim_speed * #sk.torch)
+  end
 end
 
 function reset_pal()
