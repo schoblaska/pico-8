@@ -83,8 +83,8 @@ function _init()
         add(
           torches,
           {
-            x = x * 8,
-            y = y * 8,
+            x = x,
+            y = y,
             frame = 0,
             anim_speed = 10,
             luminosity = 3
@@ -115,8 +115,10 @@ function _draw()
   spr(player_sprite, player.x - camera.x, player.y - camera.y, 1, 1, player.facing == "l" and true or false)
 
   for torch in all(torches) do
-    local torch_sprite = sk.torch[flr(torch.frame / torch.anim_speed) % #sk.torch + 1]
-    spr(torch_sprite, torch.x - camera.x, torch.y - camera.y, 1, 1, torch.facing == "l" and true or false)
+    if is_visible(torch.x, torch.y) then
+      local torch_sprite = sk.torch[flr(torch.frame / torch.anim_speed) % #sk.torch + 1]
+      spr(torch_sprite, torch.x * 8 - camera.x, torch.y * 8 - camera.y, 1, 1)
+    end
   end
 
   -- debugging
@@ -294,6 +296,18 @@ function iclamp(val, lower, upper)
   return flr(max(min(val, upper), lower))
 end
 
+function player_map_x()
+  return flr((player.x + 4) / 8)
+end
+
+function player_map_y()
+  return flr((player.y + 4) / 8)
+end
+
+function is_visible(map_x, map_y)
+  return line_of_sight(player_map_x(), player_map_y(), map_x, map_y)
+end
+
 -- lighting code below
 function line_of_sight(x1, y1, x2, y2)
   local cache_key = x1 .. "," .. y1 .. "," .. x2 .. "," .. y2
@@ -361,10 +375,7 @@ function refresh_lightmap()
   end
 
   -- determine which map tile the player is "most" on
-  local player_map_x = flr((player.x + 4) / 8)
-  local player_map_y = flr((player.y + 4) / 8)
-
-  add_light_source(player.luminosity, player_map_x, player_map_y)
+  add_light_source(player.luminosity, player_map_x(), player_map_y())
 end
 
 function draw_lightmap()
