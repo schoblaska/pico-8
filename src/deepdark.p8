@@ -212,8 +212,8 @@ function player_move(x, y)
     local movecoly1 = flr(player.y / 8)
     local movecoly2 = flr((player.y + 7) / 8)
 
-    local top_blocked = is_wall(movecolx, movecoly1)
-    local bottom_blocked = is_wall(movecolx, movecoly2)
+    local top_blocked = is_impassable(movecolx, movecoly1)
+    local bottom_blocked = is_impassable(movecolx, movecoly2)
 
     if top_blocked or bottom_blocked then
       can_move_x = false
@@ -234,8 +234,8 @@ function player_move(x, y)
     local moverowx1 = flr(player.x / 8)
     local moverowx2 = flr((player.x + 7) / 8)
 
-    local left_blocked = is_wall(moverowx1, moverowy)
-    local right_blocked = is_wall(moverowx2, moverowy)
+    local left_blocked = is_impassable(moverowx1, moverowy)
+    local right_blocked = is_impassable(moverowx2, moverowy)
 
     if left_blocked or right_blocked then
       can_move_y = false
@@ -288,6 +288,20 @@ end
 
 function is_wall(x, y)
   return fget(mget(x, y), 0)
+end
+
+function is_torch(x, y)
+  for torch in all(torches) do
+    if torch.x == x and torch.y == y then
+      return true
+    end
+  end
+
+  return false
+end
+
+function is_impassable(x, y)
+  return is_wall(x, y) or is_torch(x, y)
 end
 
 function dist(ax, ay, bx, by)
