@@ -66,8 +66,8 @@ function anymfget(px, py, flag)
 end
 
 function offsetmget(self, px, py)
-	local tilex = flr((px + self.offset.x) / 8) % 63
-	local tiley = flr((py + self.offset.y) / 8) % 31
+	local tilex = flr((px + self.offset) / 8) % 63
+	local tiley = flr((py) / 8) % 31
 
 	return self.tiles[tilex][tiley]
 end
@@ -330,8 +330,8 @@ function m_player(x,y)
 
 			--move in x
 			self.x+=self.dx
-			maps[0].offset.x+=(self.dx/2)
-			maps[2].offset.x+=(self.dx*3)
+			maps[0].offset+=(self.dx/2)
+			maps[2].offset+=(self.dx*3)
 
 			--hit walls
 			collide_side(self)
@@ -494,14 +494,14 @@ function m_cam(target)
 			if(self.pos.y>self.pos_max.y)self.pos.y=self.pos_max.y
 		end,
 
-		cam_pos=function(self, offsetx, offsety)
+		cam_pos=function(self, offsetx)
 			--calculate camera shake.
 			local shk=m_vec(0,0)
 			-- if self.shake_remaining>0 then
 			-- 	shk.x=rnd(self.shake_force)-(self.shake_force/2)
 			-- 	shk.y=rnd(self.shake_force)-(self.shake_force/2)
 			-- end
-			return self.pos.x-64+shk.x+offsetx,self.pos.y-64+shk.y+offsety
+			return self.pos.x-64+shk.x+offsetx,self.pos.y-64+shk.y
 		end,
 
 		pull_max_x=function(self)
@@ -543,9 +543,9 @@ function reset()
 
 	--init parallax maps
 	maps={}
-	maps[0]={tiles={},offset={x=0,y=0}}
-	maps[1]={tiles={},offset={x=0,y=0}}
-	maps[2]={tiles={},offset={x=0,y=0}}
+	maps[0]={tiles={},offset=0}
+	maps[1]={tiles={},offset=0}
+	maps[2]={tiles={},offset=0}
 
 	--initialize empty 64x32 matrices
 	for i=0,63 do
@@ -595,7 +595,7 @@ function _draw()
 	cls(0)
 
 	for m=0,2 do
-		camera(cam:cam_pos(maps[m].offset.x, maps[m].offset.y))
+		camera(cam:cam_pos(maps[m].offset))
 
 		for i=0,63 do
 			for j=0,31 do
@@ -607,7 +607,7 @@ function _draw()
 		end
 	end
 
-	camera(cam:cam_pos(0, 0))
+	camera(cam:cam_pos(0))
 	p1:draw()
 
 	--hud
