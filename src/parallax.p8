@@ -61,6 +61,14 @@ function intersects_box_box(
 	return true
 end
 
+function anymfget(x, y, flag)
+	return fget(multimget(map0, x, y), flag) or fget(multimget(map1, x, y), flag) or fget(multimget(map2, x, y), flag)
+end
+
+function multimget(amap, x, y)
+	return amap.tiles[flr(x + amap.offset.x) % 63][flr(y + amap.offset.y) % 31]
+end
+
 --check if pushing into side tile and resolve.
 --requires self.dx,self.x,self.y, and
 --assumes tile flag 0 == solid
@@ -99,8 +107,8 @@ function collide_floor(self)
 	--check for collision at multiple points along the bottom
 	--of the sprite: left, center, and right.
 	for i=-(self.w/3),(self.w/3),2 do
-		local tile=mget((self.x+i)/8,(self.y+(self.h/2))/8)
-		if fget(tile,0) or (fget(tile,1) and self.dy>=0) then
+		local is_floor=anymfget((self.x+i)/8,(self.y+(self.h/2))/8, 0)
+		if is_floor then
 			self.dy=0
 			self.y=(flr((self.y+(self.h/2))/8)*8)-(self.h/2)
 			self.grounded=true
@@ -526,19 +534,19 @@ function reset()
 	cam=m_cam(p1)
 
 	--init parallax maps
-	map0={}
-	map1={}
-	map2={}
+	map0={tiles={},offset={x=0,y=0}}
+	map1={tiles={},offset={x=0,y=0}}
+	map2={tiles={},offset={x=0,y=0}}
 
 	--initialize empty 64x32 matrices
 	for i=0,63 do
-		map0[i]={}
-		map1[i]={}
-		map2[i]={}
+		map0.tiles[i]={}
+		map1.tiles[i]={}
+		map2.tiles[i]={}
 		for j=0,31 do
-			map0[i][j]=0
-			map1[i][j]=0
-			map2[i][j]=0
+			map0.tiles[i][j]=0
+			map1.tiles[i][j]=0
+			map2.tiles[i][j]=0
 		end
 	end
 
@@ -547,11 +555,11 @@ function reset()
 		for j=0,31 do
 			local sprite=mget(i,j)
 			if sprite>=128 and sprite<=187 then
-				map0[i][j]=sprite -- red
+				map0.tiles[i][j]=sprite -- red
 			elseif sprite>=192 and sprite<=251 then
-				map1[i][j]=sprite -- gren
+				map1.tiles[i][j]=sprite -- green
 			elseif sprite>=64 and sprite<=123 then
-				map2[i][j]=sprite -- blue
+				map2.tiles[i][j]=sprite -- blue
 			end
 		end
 	end
@@ -851,7 +859,7 @@ d1d1d1d1d1dd11500000000000000001000000010000511d1dd1d1d1d1d1d1d1d1d1d1d1d1d1d1d1
 
 __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001010101000000000000000000000000010101010000000000000000000000000101010100000000000000000000000001010100000100000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0101010100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001010100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
