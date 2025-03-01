@@ -81,13 +81,15 @@ function collide_side(self)
 	local offset=self.w/3
 	for i=-(self.w/3),(self.w/3),2 do
 	--if self.dx>0 then
-		if fget(mget((self.x+(offset))/8,(self.y+i)/8),0) then
+    local is_side_right = anymfget(self.x+offset,self.y+i, 0)
+		if is_side_right then
 			self.dx=0
 			self.x=(flr(((self.x+(offset))/8))*8)-(offset)
 			return true
 		end
 	--elseif self.dx<0 then
-		if fget(mget((self.x-(offset))/8,(self.y+i)/8),0) then
+		local is_side_left = anymfget(self.x-offset,self.y+i, 0)
+		if is_side_left then
 			self.dx=0
 			self.x=(flr((self.x-(offset))/8)*8)+8+(offset)
 			return true
@@ -129,7 +131,8 @@ function collide_roof(self)
 	--check for collision at multiple points along the top
 	--of the sprite: left, center, and right.
 	for i=-(self.w/3),(self.w/3),2 do
-		if fget(mget((self.x+i)/8,(self.y-(self.h/2))/8),0) then
+		local is_roof = anymfget(self.x+i,self.y-(self.h/2), 0)
+		if is_roof then
 			self.dy=0
 			self.y=flr((self.y-(self.h/2))/8)*8+8+(self.h/2)
 			self.jump_hold_time=0
@@ -596,9 +599,6 @@ function _draw()
 
 	--hud
 	camera(0,0)
-
-	printc("adv. micro platformer",64,4,7,0,0)
-
 end
 
 __gfx__
