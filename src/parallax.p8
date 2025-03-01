@@ -62,10 +62,10 @@ function intersects_box_box(
 end
 
 function anymfget(px, py, flag)
-	return fget(multimget(map0, px, py), flag) or fget(multimget(map1, px, py), flag) or fget(multimget(map2, px, py), flag)
+	return fget(offsetmget(maps[0], px, py), flag) or fget(offsetmget(maps[1], px, py), flag) or fget(offsetmget(maps[2], px, py), flag)
 end
 
-function multimget(self, px, py)
+function offsetmget(self, px, py)
 	local tilex = flr((px + self.offset.x) / 8) % 63
 	local tiley = flr((py + self.offset.y) / 8) % 31
 
@@ -540,19 +540,20 @@ function reset()
 	cam=m_cam(p1)
 
 	--init parallax maps
-	map0={tiles={},offset={x=0,y=0}}
-	map1={tiles={},offset={x=0,y=0}}
-	map2={tiles={},offset={x=0,y=0}}
+	maps={}
+	maps[0]={tiles={},offset={x=0,y=0}}
+	maps[1]={tiles={},offset={x=0,y=0}}
+	maps[2]={tiles={},offset={x=0,y=0}}
 
 	--initialize empty 64x32 matrices
 	for i=0,63 do
-		map0.tiles[i]={}
-		map1.tiles[i]={}
-		map2.tiles[i]={}
+		maps[0].tiles[i]={}
+		maps[1].tiles[i]={}
+		maps[2].tiles[i]={}
 		for j=0,31 do
-			map0.tiles[i][j]=0
-			map1.tiles[i][j]=0
-			map2.tiles[i][j]=0
+			maps[0].tiles[i][j]=0
+			maps[1].tiles[i][j]=0
+			maps[2].tiles[i][j]=0
 		end
 	end
 
@@ -561,11 +562,11 @@ function reset()
 		for j=0,31 do
 			local sprite=mget(i,j)
 			if sprite>=128 and sprite<=187 then
-				map0.tiles[i][j]=sprite -- red
+				maps[0].tiles[i][j]=sprite -- red
 			elseif sprite>=192 and sprite<=251 then
-				map1.tiles[i][j]=sprite -- green
+				maps[1].tiles[i][j]=sprite -- green
 			elseif sprite>=64 and sprite<=123 then
-				map2.tiles[i][j]=sprite -- blue
+				maps[2].tiles[i][j]=sprite -- blue
 			end
 		end
 	end
@@ -593,7 +594,16 @@ function _draw()
 
 	camera(cam:cam_pos())
 
-	map(0,0,0,0,128,128)
+	for m=0,2 do
+		for i=0,63 do
+			for j=0,31 do
+				local tile=maps[m].tiles[i][j]
+				if tile>0 then
+					spr(tile,i*8,j*8)
+				end
+			end
+		end
+	end
 
 	p1:draw()
 
