@@ -61,12 +61,15 @@ function intersects_box_box(
 	return true
 end
 
-function anymfget(x, y, flag)
-	return fget(multimget(map0, x, y), flag) or fget(multimget(map1, x, y), flag) or fget(multimget(map2, x, y), flag)
+function anymfget(px, py, flag)
+	return fget(multimget(map0, px, py), flag) or fget(multimget(map1, px, py), flag) or fget(multimget(map2, px, py), flag)
 end
 
-function multimget(amap, x, y)
-	return amap.tiles[flr(x + amap.offset.x) % 63][flr(y + amap.offset.y) % 31]
+function multimget(self, px, py)
+	local tilex = flr((px + self.offset.x) / 8) % 63
+	local tiley = flr((py + self.offset.y) / 8) % 31
+
+	return self.tiles[tilex][tiley]
 end
 
 --check if pushing into side tile and resolve.
@@ -107,7 +110,7 @@ function collide_floor(self)
 	--check for collision at multiple points along the bottom
 	--of the sprite: left, center, and right.
 	for i=-(self.w/3),(self.w/3),2 do
-		local is_floor=anymfget((self.x+i)/8,(self.y+(self.h/2))/8, 0)
+		local is_floor=anymfget(self.x+i,self.y+(self.h/2), 0)
 		if is_floor then
 			self.dy=0
 			self.y=(flr((self.y+(self.h/2))/8)*8)-(self.h/2)
